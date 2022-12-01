@@ -1,1 +1,4 @@
 .DS_store
+trained_models
+MUJOCO_LOG.TXT
+*__pycache__

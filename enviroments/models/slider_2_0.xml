@@ -5,29 +5,31 @@
   <!-- Default values -->
   <default>
     <joint limited = "true" damping = "0.2" armature = "0"/>
+    <position forcelimited = "true" forcerange = "-15 15" />
+    <velocity forcelimited = "true" forcerange = "-20 20" />
     
     <default class = "main_joint">
-        <position ctrllimited="true" kp="30.0" gear="1"/>
+        <position ctrllimited="true" kp="50.0" gear="1"/>
     </default>
 
     <default class = "main_vel">
-        <velocity kv="5.0" group="1" gear = "1"/>
+        <velocity kv="2.0" group="1" gear = "1"/>
     </default>
 
     <default class = "slide_joint">
-      <position ctrllimited="true" kp="500" gear="1"/>
+      <position ctrllimited="true" kp="500" gear="1" forcerange = "-200 200"/>
     </default>
 
     <default class = "slide_vel">
-      <velocity kv="50.0" group="1" gear = "1"/>
+      <velocity kv="40.0" group="1" gear = "1" forcerange = "-200 200"/>
     </default>
 
     <default class = "foot_joint">
-        <position ctrllimited="true" kp="10.0" gear = "2"/>
+        <position ctrllimited="true" kp="25.0" gear = "1"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity kv="0.5" group="1" gear ="1"/>
+        <velocity kv="1.5" group="1" gear ="1"/>
     </default>
   </default>
 
@@ -48,7 +50,7 @@
 
   <!-- Robot description -->
   <worldbody>
-    <body name="base_link" pos="0 0 1">
+    <body name="base_link" pos="0 0 0.85">
       <freejoint/>
       <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="2.43528" diaginertia="0.00413343 0.00271163 0.00231369"/>
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
@@ -125,6 +127,8 @@
   <!-- Actuator Description -->
   <actuator>
 
+        <!-- Left leg control -->
+
         <!-- Right leg control -->
         <position name="Right_Roll" joint="Right_Roll" ctrlrange="-0.75 0.75" class="main_joint"/>
         <velocity joint="Right_Roll" class="main_vel" kv = "10.0"/>
@@ -132,7 +136,7 @@
         <position name="Right_Pitch" joint="Right_Pitch" ctrlrange="-0.75 0.75" class="main_joint"/>
         <velocity joint="Right_Pitch" class="main_vel"/>
 
-        <position name="Right_Slide" joint="Right_Slide" ctrlrange="-0.1 0.2" class="slide_joint"/>
+        <position name="Right_Slide" joint="Right_Slide" ctrlrange="-0.2 0.2" class="slide_joint"/>
         <velocity joint="Right_Slide" class="slide_vel"/>
 
         <position name="Right_Foot_Roll" joint="Right_Foot_Roll" ctrlrange="-0.5 0.5" class="foot_joint"/>
@@ -141,14 +145,13 @@
         <position name="Right_Foot_Pitch" joint="Right_Foot_Pitch" ctrlrange="-0.5 0.5" class="foot_joint"/>
         <velocity joint="Right_Foot_Pitch" class = "foot_vel"/>
 
-        <!-- Left leg control -->
-        <position name="Left_Roll" joint="Left_Roll" ctrlrange="-0.75 0.75" class="main_joint"/>
+        <position name="Left_Roll" joint="Right_Roll" ctrlrange="-0.75 0.75" class="main_joint"/>
         <velocity joint="Left_Roll" class="main_vel" kv = "10.0"/>
 
         <position name="Left_Pitch" joint="Left_Pitch" ctrlrange="-0.75 0.75" class="main_joint"/>
         <velocity joint="Left_Pitch" class="main_vel"/>
 
-        <position name="Left_Slide" joint="Left_Slide" ctrlrange="-0.1 0.2" class="slide_joint"/>
+        <position name="Left_Slide" joint="Left_Slide" ctrlrange="-0.2 0.2" class="slide_joint"/>
         <velocity joint="Left_Slide" class="slide_vel"/>
 
         <position name="Left_Foot_Roll" joint="Left_Foot_Roll" ctrlrange="-0.5 0.5" class="foot_joint"/>
