@@ -1,23 +1,32 @@
 <mujoco model="slider_joint_control">
   <compiler angle="radian" meshdir="../meshes/" autolimits="true"/>
-  <size njmax="500" nconmax="100"/>
+  <!-- <size njmax="500" nconmax="100"/> -->
   
   <!-- Default values -->
   <default>
-    <joint limited = "true" damping = "0.2" armature = "0"/>
-    <position forcelimited = "true" forcerange = "-15 15" />
-    <velocity forcelimited = "true" forcerange = "-20 20" />
-    
-    <default class = "main_joint">
-        <position ctrllimited="true" kp="50.0" gear="1"/>
+    <joint limited = "true" damping = "1.0" armature = "0"/>
+    <position forcelimited = "true" forcerange = "-30 30" />
+    <velocity forcelimited = "true" forcerange = "-30 30" />
+
+    <default class = "hip_roll_pos">
+      <position kp="50.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
     </default>
 
-    <default class = "main_vel">
-        <velocity kv="2.0" group="1" gear = "1"/>
+    <default class = "hip_roll_vel">
+      <velocity  kv="2.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
     </default>
+
+    <default class = "hip_pitch_pos">
+      <position kp="50.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
+    </default>
+
+    <default class = "hip_pitch_vel">
+      <velocity  kv="2.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+    </default>
+
 
     <default class = "slide_joint">
-      <position ctrllimited="true" kp="500" gear="1" forcerange = "-200 200"/>
+      <position ctrllimited="true" kp="400" gear="1" forcerange = "-200 200"/>
     </default>
 
     <default class = "slide_vel">
@@ -25,11 +34,11 @@
     </default>
 
     <default class = "foot_joint">
-        <position ctrllimited="true" kp="25.0" gear = "1"/>
+        <position forcelimited="true" ctrllimited="true" kp="50.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity kv="1.5" group="1" gear ="1"/>
+        <velocity forcelimited="true" kv="1.5" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 
@@ -51,7 +60,11 @@
   <!-- Robot description -->
   <worldbody>
     <body name="base_link" pos="0 0 0.85">
+    <!-- 0.85 -->
       <freejoint/>
+
+      <site name = "Torso"/>
+
       <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="2.43528" diaginertia="0.00413343 0.00271163 0.00231369"/>
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
@@ -74,6 +87,8 @@
                 <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.760542" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot"/>
+                 <site name = "Right-Foot" size = "0.22 0.12 0.03" type = "box" rgba = "0.5 0.5 0.5 0.1"/>
+
               </body> 
             </body>
           </body>
@@ -99,6 +114,8 @@
                 <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.760542" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot"/>
+                <site name = "Left-Foot" size = "0.22 0.12 0.03" type = "box" rgba = "0.5 0.5 0.5 0.1"/>
+
                 <!-- <geom size="0.01" pos="0.08181 0.04715 -0.0325"/>
                 <geom size="0.01" pos="0.08181 -0.04715 -0.0325" rgba="0 0 0.8 1"/>
                 <geom size="0.01" pos="-0.08181 -0.04715 -0.0325"/>
@@ -122,6 +139,7 @@
     <exclude body1= "base_link" body2 = "Left_Slide_Casing"/>
     <exclude body1= "base_link" body2 = "Left_Leg"/>
     <exclude body1= "Left_Pitch_Casing" body2 = "Left_Leg"/>
+    <exclude body1= "Left_Foot" body2 = "Left_Leg"/>
   </contact>
 
   <!-- Actuator Description -->
@@ -130,13 +148,13 @@
         <!-- Left leg control -->
 
         <!-- Right leg control -->
-        <position name="Right_Roll" joint="Right_Roll" ctrlrange="-0.75 0.75" class="main_joint"/>
-        <velocity joint="Right_Roll" class="main_vel" kv = "10.0"/>
+        <position name="Right_Roll" joint="Right_Roll" class="hip_roll_pos"/>
+        <velocity joint="Right_Roll" class="hip_roll_vel"/>
 
-        <position name="Right_Pitch" joint="Right_Pitch" ctrlrange="-0.75 0.75" class="main_joint"/>
-        <velocity joint="Right_Pitch" class="main_vel"/>
+        <position name="Right_Pitch" joint="Right_Pitch" class="hip_pitch_pos"/>
+        <velocity joint="Right_Pitch" class="hip_pitch_vel"/>
 
-        <position name="Right_Slide" joint="Right_Slide" ctrlrange="-0.2 0.2" class="slide_joint"/>
+        <position name="Right_Slide" joint="Right_Slide" ctrlrange="-0.1 0.3" class="slide_joint"/>
         <velocity joint="Right_Slide" class="slide_vel"/>
 
         <position name="Right_Foot_Roll" joint="Right_Foot_Roll" ctrlrange="-0.5 0.5" class="foot_joint"/>
@@ -145,13 +163,13 @@
         <position name="Right_Foot_Pitch" joint="Right_Foot_Pitch" ctrlrange="-0.5 0.5" class="foot_joint"/>
         <velocity joint="Right_Foot_Pitch" class = "foot_vel"/>
 
-        <position name="Left_Roll" joint="Right_Roll" ctrlrange="-0.75 0.75" class="main_joint"/>
-        <velocity joint="Left_Roll" class="main_vel" kv = "10.0"/>
+        <position name="Left_Roll" joint="Left_Roll" class="hip_roll_pos"/>
+        <velocity joint="Left_Roll" class="hip_roll_vel"/>
 
-        <position name="Left_Pitch" joint="Left_Pitch" ctrlrange="-0.75 0.75" class="main_joint"/>
-        <velocity joint="Left_Pitch" class="main_vel"/>
+        <position name="Left_Pitch" joint="Left_Pitch" class="hip_pitch_pos"/>
+        <velocity joint="Left_Pitch" class="hip_pitch_vel"/>
 
-        <position name="Left_Slide" joint="Left_Slide" ctrlrange="-0.2 0.2" class="slide_joint"/>
+        <position name="Left_Slide" joint="Left_Slide" ctrlrange="-0.1 0.3" class="slide_joint"/>
         <velocity joint="Left_Slide" class="slide_vel"/>
 
         <position name="Left_Foot_Roll" joint="Left_Foot_Roll" ctrlrange="-0.5 0.5" class="foot_joint"/>
@@ -160,6 +178,19 @@
         <position name="Left_Foot_Pitch" joint="Left_Foot_Pitch" ctrlrange="-0.5 0.5" class="foot_joint"/>
         <velocity joint="Left_Foot_Pitch" class = "foot_vel"/>
     </actuator>
+
+    <!-- Sensors -->
+    <sensor>
+        <velocimeter name = "right-foot-vel" site = "Right-Foot"/>
+        <velocimeter name = "left-foot-vel" site = "Left-Foot"/>
+
+        <velocimeter name = "body-vel" site = "Torso"/>
+        <gyro name = "body-gyro" site = "Torso"/>
+        <accelerometer name = "body-accel" site = "Torso"/>
+
+        <touch name = "left-foot-touch" site = "Left-Foot"/>
+        <touch name = "right-foot-touch" site = "Right-Foot"/>
+    </sensor>
 
     
 </mujoco>

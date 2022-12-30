@@ -5,7 +5,11 @@
 
     <!-- <statistic extent="1.5" meansize=".05"/> -->
 
-    <!-- <option timestep="0.002" jacobian="auto"/> -->
+    <option jacobian="auto">
+        <flag multiccd="enable"/>
+    </option>
+
+    <option viscosity="0.1"/>
 
     <!-- Rendering properties -->
     <visual>
@@ -34,6 +38,14 @@
 
         <!-- Flat ground plane -->
         <geom name="ground" type="plane" size="0 0 1" pos="0 0 0.1" quat="1 0 0 0" material="matplane" condim="1"/>
+
+        <!-- <geom name="obstical2" type = "box" size = "1 5 0.05" pos = "8 0 0.1"/> -->
+
+        <!-- <geom name="obstical3" type = "box" size = "2 5 0.05" pos = "12 0 0.1"/> -->
+
+        <!-- <geom name="obstical4" type = "box" size = "0.5 1 0.05" pos = "2 2 0.1" />
+        <geom name="obstical5" type = "box" size = "0.5 1 0.05" pos = "3 1 0.1"/>
+        <geom name="obstical6" type = "box" size = "0.5 1 0.05" pos = "0 0 0.1" material="matplane" condim="1"/> -->
 
     </worldbody>
 

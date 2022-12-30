@@ -13,16 +13,11 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "initial_testing_10"
+trial_name = "trial-24"
 model_save_path = "./trained_models/" + trial_name
 
-# Make save path
-try:
-    os.mkdir(model_save_path)
-except FileExistsError:
-    pass
 
-model =  PPO.load(model_save_path + "/model-11", env=env)
+model =  PPO.load(model_save_path + "/model-13", env=env)
 
 while True:
     # Reset enviroment
@@ -35,7 +30,7 @@ while True:
         env.render()
         
 
-        print(reward)
+        # print(reward)
 
         # if(done):
         #     env.reset()
