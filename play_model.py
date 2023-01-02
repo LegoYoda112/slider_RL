@@ -13,11 +13,11 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "trial-24"
+trial_name = "trial-30-sidways-cost"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-13", env=env)
+model =  PPO.load(model_save_path + "/model-23", env=env)
 
 while True:
     # Reset enviroment
@@ -35,4 +35,4 @@ while True:
         # if(done):
         #     env.reset()
 
-        time.sleep(0.015)
+        time.sleep(0.016)

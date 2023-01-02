@@ -16,7 +16,7 @@ class SliderEnv(Env):
 
         # Gait params
         self.step_time = 0.6 # s - time per step
-        self.stance_time = 0.3 # time per stance
+        self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
         self.cycle_clock = 0
@@ -212,10 +212,10 @@ class SliderEnv(Env):
         cost += self.cost_dict["effort"]
         
         # Velocity tracking cost
-        self.cost_dict["body_vel"] = 1.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 0.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
+        self.cost_dict["body_vel"] = 1.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 1.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
         cost += self.cost_dict["body_vel"]
 
-        print(self.data.qvel[0])
+        # print(self.data.qvel[0])
 
         # Add a constant offset to prevent early termination
         reward = 1.0 - cost
