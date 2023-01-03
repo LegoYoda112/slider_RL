@@ -23,6 +23,9 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
+        self.action_noise_scale = 0.1
+        self.action_offset_noise_scale = 0.1
+
         # ======= MUJOCO INIT =======
         self.cam = mj.MjvCamera()
         self.opt = mj.MjvOption()
@@ -78,7 +81,9 @@ class SliderEnv(Env):
         self.v_ref = (np.random.uniform(0.5, 0.0), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
         self.v_ref = (0.8, 0, 0)
 
-        self.target_torso_height = 0.4
+        # self.target_torso_height = 0.4
+
+        self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
         # Randomize starting position and velocity
         self.data.qpos[0] = np.random.uniform(-3, -2)
@@ -161,6 +166,14 @@ class SliderEnv(Env):
 
         # action = action
 
+        # print(self.data.actuator("Left_Slide").ctrl)
+        action_noise = 1
+
+        # Apply noise and constant offsets to actions
+        action += np.random.normal(size=(len(action))) * self.action_noise_scale + self.action_offset_noise
+
+        # action[7]
+
         # ====== Left foot
         # Roll Pitch
         self.data.ctrl[0] = action[0] * 0.3
@@ -184,6 +197,8 @@ class SliderEnv(Env):
         # Foot Roll Pitch
         self.data.ctrl[16] = action[8] * 0.5
         self.data.ctrl[18] = action[9] * 0.5
+
+
 
 
         # TORQUE CONTROL
