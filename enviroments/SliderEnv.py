@@ -37,7 +37,7 @@ class SliderEnv(Env):
 
         # Create camera
         mj.mjv_defaultCamera(self.cam)
-        self.cam.distance = 5
+        self.cam.distance = 3
         self.cam.lookat = (1, 0, 1)
         mj.mjv_defaultOption(self.opt)
 
@@ -61,8 +61,12 @@ class SliderEnv(Env):
                                             high = np.ones(self.observation_shape) * observation_max,
                                             dtype = np.float32)
 
-        # Action space, both slide positions
-        self.action_space = spaces.Box(-np.ones(10) * 1, np.ones(10) * 1, dtype = np.float32)
+        # Action space
+        # 0-4 leg 0 positions
+        # 5-9 leg 1 positions
+        # 10-14 leg position gains
+        num_actions = 10
+        self.action_space = spaces.Box(-np.ones(num_actions) * 1, np.ones(num_actions) * 1, dtype = np.float32)
 
     # Gym reset method
     def reset(self):
@@ -73,6 +77,8 @@ class SliderEnv(Env):
         # x, y, theta
         self.v_ref = (np.random.uniform(0.5, 0.0), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
         self.v_ref = (0.8, 0, 0)
+
+        self.target_torso_height = 0.4
 
         # Randomize starting position and velocity
         self.data.qpos[0] = np.random.uniform(-3, -2)
@@ -99,8 +105,9 @@ class SliderEnv(Env):
         torso_pos = self.data.body("base_link").xpos
         torso_x = torso_pos[0]
         torso_y = torso_pos[1]
-        self.cam.lookat = (torso_x, torso_y, 1.0)
+        self.cam.lookat = (torso_x, torso_y, 0.5)
         self.cam.azimuth = self.data.time * 10
+        # self.data.time * 10
         # self.cam.azimuth = 90
         self.cam.elevation = -15
 
@@ -148,20 +155,81 @@ class SliderEnv(Env):
 
     # Apply an action
     def act(self, action):
-        self.data.actuator("Left_Slide").ctrl = action[0] * 0.2 + 0.1
-        self.data.actuator("Right_Slide").ctrl = action[1] * 0.2 + 0.1
+        # action = -np.ones(15) * 1
+        # print(self.data.actuator)
+        # print(self.data.gain)
 
-        self.data.actuator("Left_Roll").ctrl = action[2] * 0.3
-        self.data.actuator("Right_Roll").ctrl = action[3] * 0.3
+        # action = action
 
-        self.data.actuator("Left_Pitch").ctrl = action[4] * 0.8
-        self.data.actuator("Right_Pitch").ctrl = action[5] * 0.8
+        # ====== Left foot
+        # Roll Pitch
+        self.data.ctrl[0] = action[0] * 0.3
+        self.data.ctrl[2] = action[1] * 0.8
+        
+        # Slide
+        self.data.ctrl[4] = action[2] * 0.2 + 0.1
 
-        self.data.actuator("Left_Foot_Pitch").ctrl = action[6] * 0.5
-        self.data.actuator("Right_Foot_Pitch").ctrl = action[7] * 0.5
+        # Foot Roll Pitch
+        self.data.ctrl[6] = action[3] * 0.5
+        self.data.ctrl[8] = action[4] * 0.5
 
-        self.data.actuator("Left_Foot_Pitch").ctrl = action[8] * 0.5
-        self.data.actuator("Right_Foot_Pitch").ctrl = action[9] * 0.5
+        # ====== Right foot
+        # Roll Pitch
+        self.data.ctrl[10] = action[5] * 0.3
+        self.data.ctrl[12] = action[6] * 0.8
+        
+        # Slide
+        self.data.ctrl[14] = action[7] * 0.2 + 0.1
+
+        # Foot Roll Pitch
+        self.data.ctrl[16] = action[8] * 0.5
+        self.data.ctrl[18] = action[9] * 0.5
+
+
+        # TORQUE CONTROL
+        # self.data.actuator("Left_Slide").ctrl = action[0] * 0.2 + 0.1
+        # self.data.actuator("Right_Slide").ctrl = action[1] * 0.2 + 0.1
+
+        # self.data.actuator("Left_Roll").ctrl = action[2] * 0.3
+        # self.data.actuator("Right_Roll").ctrl = action[3] * 0.3
+
+        # self.data.actuator("Left_Pitch").ctrl = action[4] * 0.8
+        # self.data.actuator("Right_Pitch").ctrl = action[5] * 0.8
+
+        # self.data.actuator("Left_Foot_Pitch").ctrl = action[6] * 0.5
+        # self.data.actuator("Right_Foot_Pitch").ctrl = action[7] * 0.5
+
+        # self.data.actuator("Left_Foot_Pitch").ctrl = action[8] * 0.5
+        # self.data.actuator("Right_Foot_Pitch").ctrl = action[9] * 0.5
+
+        # Set gain params
+        # self.set_actuator_kp_gains(action[10:15])
+
+    # Set the gain parameters of each actuator
+    # Input gain is normalized from -1 to 1
+    def set_actuator_kp_gains(self, gain_list):
+        # print(self.model.actuator_gainprm)
+
+
+        #self.model.actuator_gainprm[12][0] = 100000.0;
+        #self.model.actuator_gainprm[14][0] = 100000.0;
+        #self.model.actuator_gainprm[16][0] = 100000.0;
+        #self.model.actuator_gainprm[18][0] = 100000.0;
+
+        gain_list = [-1, -1, -1, -1, -1];
+        # print(gain_list)
+        for i in range(5):
+            pass
+            # Scale action from -1 - 1 to 0 - 500
+            #self.model.actuator_gainprm[i*2][0] = 0.0 + 500 * (gain_list[i] + 1) * 0.5
+            #self.model.actuator_gainprm[i*2 + 10][0] = 0.0 + 500 * (gain_list[i] + 1) * 0.5
+            #self.model.actuator_gainprm[i*2][0] = 100
+            #self.model.actuator_gainprm[i*2 + 10][0] = 100
+            # print(self.model.actuator_gainprm[i*2 + 10])
+
+            #self.model.actuator_gainprm[i*2][0] = 500
+            #self.model.actuator_gainprm[i*2 + 10][0] = 500
+        # asd;lfkjasdf
 
     def compute_reward(self):
         cost = 0
@@ -219,8 +287,6 @@ class SliderEnv(Env):
 
         # Add a constant offset to prevent early termination
         reward = 1.0 - cost
-
-        # print(reward)
 
         # Return reward
         return reward

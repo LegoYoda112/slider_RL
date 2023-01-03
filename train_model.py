@@ -14,13 +14,13 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "trial-31-sidways-cost"
+trial_name = "position-5"
 model_save_path = "./trained_models/" + trial_name
 
-# trial_load_name = "trial-22"
+# trial_load_name = "position-3"
 # model_save_path_load = "./trained_models/" + trial_load_name
 
-# model =  PPO.load(model_save_path_load + "/model-28", env=env)
+# model =  PPO.load(model_save_path_load + "/model-75", env=env)
 
 # Make save path
 try:
