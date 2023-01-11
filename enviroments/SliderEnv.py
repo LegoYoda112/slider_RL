@@ -23,11 +23,14 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
-        self.action_noise_scale = 0.1
-        self.action_offset_noise_scale = 0.1
+        self.action_noise_scale = 0.01
+        self.action_offset_noise_scale = 0.01
 
         self.purtrub_max = [50,50,50] # Newtons
         self.purtrub_prob = 0.01 # Probability per timestep
+
+        # self.v_ref_change_prob = 0.005
+        self.v_ref = [0,0,0]
 
         # ======= MUJOCO INIT =======
         self.cam = mj.MjvCamera()
@@ -81,8 +84,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        self.v_ref = (np.random.uniform(0.5, 0.0), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
-        self.v_ref = (0.5, 0, 0)
+        self.v_ref = (np.random.uniform(1.0, 0.0), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
+        # self.v_ref = (0.5, 0, 0)
 
         # self.target_torso_height = 0.4
 
@@ -157,6 +160,10 @@ class SliderEnv(Env):
             # print("fall")
             done = True
         
+        # if(np.random.random() < self.v_ref_change_prob):
+        #     # print("vref change!")
+        #     self.v_ref = (np.random.uniform(1.0, 0.0), np.random.uniform(-0.5, 0.5), np.random.uniform(-0.0, 0.0))
+
         info = {}
 
         return observation, reward, done, info
@@ -264,15 +271,16 @@ class SliderEnv(Env):
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 1.0
+        slide_factor = 2.0
+        roll_factor = 2.0
         # Increase ankle effort compared to other actuator effort
         ankle_factor = 1.0
 
         actuator_effort = (self.data.actuator("Left_Slide").force[0] ** 2  / 200.0) * slide_factor
         actuator_effort += (self.data.actuator("Right_Slide").force[0] ** 2 / 200.0) * slide_factor
 
-        actuator_effort += self.data.actuator("Left_Roll").force[0] ** 2 / 144.0
-        actuator_effort += self.data.actuator("Right_Roll").force[0] ** 2 / 144.0
+        actuator_effort += self.data.actuator("Left_Roll").force[0] ** 2 / 65.0 * roll_factor
+        actuator_effort += self.data.actuator("Right_Roll").force[0] ** 2 / 65.0 * roll_factor
 
         actuator_effort += self.data.actuator("Left_Pitch").force[0] ** 2 / 65.0
         actuator_effort += self.data.actuator("Right_Pitch").force[0] ** 2 / 65.0
@@ -282,7 +290,7 @@ class SliderEnv(Env):
         actuator_effort += self.data.actuator("Left_Foot_Pitch").force[0] ** 2 / 15.0 * ankle_factor
         actuator_effort += self.data.actuator("Right_Foot_Pitch").force[0] ** 2 / 15.0 * ankle_factor
         
-        self.cost_dict["effort"] = actuator_effort / 1000.0
+        self.cost_dict["effort"] = actuator_effort / 500.0
         cost += self.cost_dict["effort"]
 
         # Body velocity tracking cost
@@ -312,15 +320,20 @@ class SliderEnv(Env):
         forward_rel = np.zeros(3)
         mj.mju_rotVecQuat(forward_rel, up, quat)
 
-        self.cost_dict["body_orientation"] = 0.01 * np.linalg.norm([up_rel[0], up_rel[1]])
-        self.cost_dict["body_orientation"] = 0.01 * np.linalg.norm([forward_rel[0], forward_rel[1]])
+        self.cost_dict["body_orientation"] = 0.2 * np.linalg.norm([up_rel[0], up_rel[1]])
+        self.cost_dict["body_orientation"] = 0.5 * np.linalg.norm([forward_rel[0], forward_rel[1]])
         cost += self.cost_dict["body_orientation"]
         
         # print(self.cost_dict["body_orientation"])
         # self.cost_dict["body_movement"] = np.linalg.norm(self.data.sensor("body-gyro").data))
         self.cost_dict["body_movement"] = 0.01 * np.linalg.norm(self.data.sensor("body-gyro").data)
-        self.cost_dict["body_movement"] += 0.01 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
+        self.cost_dict["body_movement"] += 0.005 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
         cost += self.cost_dict["body_movement"]
+
+
+        print(self.data.sensor("left-foot-touch").data)
+        print(self.data.sensor("right-foot-touch").data)
+        print()
 
         # Add a constant offset to prevent early termination
         reward = (1.0 - cost)
@@ -435,6 +448,10 @@ class SliderEnv(Env):
         observation.append(10 * np.sin(self.cycle_clock * 2 * np.pi / self.step_time))
         observation.append(10 * np.sin(self.cycle_clock * 2 * np.pi / self.step_time + self.phase_offset * 2 * np.pi))
 
+
+        # ==== VREF ====
+        observation.append(self.v_ref[0])
+        observation.append(self.v_ref[1])
 
         # print(np.max(observation))
 

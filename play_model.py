@@ -13,11 +13,11 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0005,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "forward-2"
+trial_name = "forward-9"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-19", env=env)
+model =  PPO.load(model_save_path + "/model-500", env=env)
 
 while True:
     # Reset enviroment
@@ -29,6 +29,8 @@ while True:
         obs, reward, done, info = env.step(action)
         env.render()
         
+
+        print(obs[-2:])
         # print(reward)
         # print(0.1 + 200 * (action[10:15] + 1) * 0.5 + 50)
 
