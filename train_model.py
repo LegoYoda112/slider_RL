@@ -14,11 +14,11 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "forward-9"
+trial_name = "forward-23"
 model_save_path = "./trained_models/" + trial_name
 
 # trial_load_name = "forward-2"
-# model_save_path_load = "./trained_models/" + trial_load_name
+model_save_path_load = "./trained_models/" + trial_load_name
 
 # model =  PPO.load(model_save_path_load + "/model-23", env=env)
 

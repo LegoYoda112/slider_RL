@@ -69,6 +69,10 @@
     <!-- 0.85 -->
       <freejoint/>
 
+      <body>
+        <geom type="box" size="0.05 0.05 0.3" pos = "0.0 0.0 0.3" mass = "1"/>
+      </body>
+
       <site name = "Torso"/>
       <site name = "Torso-rangefinder1" zaxis = "0 0 -1"/>
       <site name = "Torso-rangefinder2" zaxis = "0.2 0 -1"/>
