@@ -23,11 +23,11 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
-        self.action_noise_scale = 0.00
-        self.action_offset_noise_scale = 0.00
+        self.action_noise_scale = 0.01
+        self.action_offset_noise_scale = 0.01
 
         self.purtrub_max = [50,50,50] # Newtons
-        self.purtrub_prob = 0.00 # Probability per timestep
+        self.purtrub_prob = 0.001 # Probability per timestep
 
         self.v_ref_change_prob = 0.005
         self.v_ref = [0,0,0]
@@ -84,8 +84,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        self.v_ref = (np.random.uniform(1.0, -1.0), np.random.uniform(1.0, -1.0), np.random.uniform(-0.0, 0.0))
-        # self.v_ref = (1.0, 0, 0)
+        # self.v_ref = (np.random.uniform(0.5, -0.5), np.random.uniform(0.5, -0.5), np.random.uniform(-0.0, 0.0))
+        self.v_ref = (1.0, 0, 0)
 
         # self.target_torso_height = 0.4
 
@@ -156,7 +156,7 @@ class SliderEnv(Env):
         
         # If we've fallen over, stop the episode6
         if(self.data.body("base_link").xpos[2] < 0.4):
-            reward -= 100.0
+            reward -= 200.0
             # print("fall")
             done = True
         
@@ -279,7 +279,7 @@ class SliderEnv(Env):
         #     # SWING
         #     pass
 
-        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.02
+        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.01
 
         cost += self.cost_dict['foot_vel']
         # print(self.cost_dict['foot_vel'])
@@ -345,7 +345,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (0.6 - cost)
+        reward = (2.0 - cost)
 
         # Return reward
         return reward
@@ -396,6 +396,7 @@ class SliderEnv(Env):
         # Body orientation
         quat = np.zeros(4)
         mj.mju_mat2Quat(quat, self.data.body("base_link").xmat)
+        # print(quat)
         
         observation.append(quat[0])
         observation.append(quat[1])
