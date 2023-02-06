@@ -23,13 +23,13 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
-        self.action_noise_scale = 0.01
-        self.action_offset_noise_scale = 0.01
+        self.action_noise_scale = 0.00
+        self.action_offset_noise_scale = 0.00
 
-        self.purtrub_max = [50,50,50] # Newtons
-        self.purtrub_prob = 0.001 # Probability per timestep
+        self.purtrub_max = [100,100,100] # Newtons
+        self.purtrub_prob = 0.005 # Probability per timestep
 
-        self.v_ref_change_prob = 0.005
+        self.v_ref_change_prob = 0.0
         self.v_ref = [0,0,0]
 
         # ======= MUJOCO INIT =======
@@ -85,7 +85,7 @@ class SliderEnv(Env):
         # Reset desired reference velocity
         # x, y, theta
         # self.v_ref = (np.random.uniform(0.5, -0.5), np.random.uniform(0.5, -0.5), np.random.uniform(-0.0, 0.0))
-        self.v_ref = (1.0, 0, 0)
+        self.v_ref = (0.5, 0.0, 0)
 
         # self.target_torso_height = 0.4
 
@@ -190,7 +190,7 @@ class SliderEnv(Env):
         self.data.ctrl[2] = action[1] * 0.8
         
         # Slide
-        self.data.ctrl[4] = action[2] * 0.2 + 0.1
+        self.data.ctrl[4] = action[2] * 0.05 + 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[6] = action[3] * 0.5
@@ -202,7 +202,7 @@ class SliderEnv(Env):
         self.data.ctrl[12] = action[6] * 0.8
         
         # Slide
-        self.data.ctrl[14] = action[7] * 0.2 + 0.1
+        self.data.ctrl[14] = action[7] * 0.05 + 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[16] = action[8] * 0.5
@@ -210,6 +210,7 @@ class SliderEnv(Env):
 
 
         if(np.random.rand() < self.purtrub_prob):
+            # print("BONK")
             F_x = np.random.normal() * self.purtrub_max[0]
             F_y = np.random.normal() * self.purtrub_max[1]
             F_z = np.random.normal() * self.purtrub_max[2]
@@ -279,7 +280,7 @@ class SliderEnv(Env):
         #     # SWING
         #     pass
 
-        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.01
+        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.02
 
         cost += self.cost_dict['foot_vel']
         # print(self.cost_dict['foot_vel'])
@@ -304,7 +305,7 @@ class SliderEnv(Env):
         actuator_effort += self.data.actuator("Left_Foot_Pitch").force[0] ** 2 / 15.0 * ankle_factor
         actuator_effort += self.data.actuator("Right_Foot_Pitch").force[0] ** 2 / 15.0 * ankle_factor
         
-        self.cost_dict["effort"] = actuator_effort / 1000.0
+        self.cost_dict["effort"] = actuator_effort / 2000.0
         cost += self.cost_dict["effort"]
 
         # Body velocity tracking cost
@@ -345,7 +346,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (2.0 - cost)
+        reward = (0.8 - cost)
 
         # Return reward
         return reward

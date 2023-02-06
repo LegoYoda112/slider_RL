@@ -8,17 +8,17 @@ from stable_baselines3 import PPO
 
 env = SliderEnv()
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0005, 
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.005, 
       tensorboard_log="./trained_models/tensorboard")
 # n_steps = int(8192 * 0.5),
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "forward-35"
+trial_name = "weaker-pid-step-time-0-6"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-18", env=env)
+model =  PPO.load(model_save_path + "/model-20", env=env)
 
 forward = False
 
