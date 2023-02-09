@@ -23,8 +23,8 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
-        self.action_noise_scale = 0.00
-        self.action_offset_noise_scale = 0.00
+        self.action_noise_scale = 0.01
+        self.action_offset_noise_scale = 0.01
 
         self.purtrub_max = [100,100,100] # Newtons
         self.purtrub_prob = 0.005 # Probability per timestep
@@ -85,7 +85,9 @@ class SliderEnv(Env):
         # Reset desired reference velocity
         # x, y, theta
         # self.v_ref = (np.random.uniform(0.5, -0.5), np.random.uniform(0.5, -0.5), np.random.uniform(-0.0, 0.0))
-        self.v_ref = (0.5, 0.0, 0)
+        self.v_ref = np.array([0.5, 0.0, 0])
+
+        self.p_ref = np.zeros(3)
 
         # self.target_torso_height = 0.4
 
@@ -190,7 +192,7 @@ class SliderEnv(Env):
         self.data.ctrl[2] = action[1] * 0.8
         
         # Slide
-        self.data.ctrl[4] = action[2] * 0.05 + 0.1
+        self.data.ctrl[4] = action[2] * 0.1 + 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[6] = action[3] * 0.5
@@ -202,7 +204,7 @@ class SliderEnv(Env):
         self.data.ctrl[12] = action[6] * 0.8
         
         # Slide
-        self.data.ctrl[14] = action[7] * 0.05 + 0.1
+        self.data.ctrl[14] = action[7] * 0.1 + 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[16] = action[8] * 0.5
@@ -253,42 +255,19 @@ class SliderEnv(Env):
         left_force = self.data.sensor("left-foot-touch").data
         right_force = self.data.sensor("right-foot-touch").data
 
-        lf_drag_cost = np.linalg.norm(lf_vel) * left_force[0] 
-        rf_drag_cost = np.linalg.norm(rf_vel) * right_force[0]
-
-        # print(lf_drag_cost)
-        # print(rf_drag_cost)
-
-        
-
-        self.cost_dict['foot_vel'] = 0
-        # # == Left Leg
-        # if(cc > self.stance_time):
-        #     # STANCE
-        #     self.cost_dict['foot_vel'] += ground_factor * np.linalg.norm(lf_vel)
-        #     pass
-        # else:
-        #     # SWING
-        #     pass
-        
-        # # == Right foot
-        # if(cc < self.stance_time):
-        #     # STANCE
-        #     self.cost_dict['foot_vel'] += ground_factor * np.linalg.norm(rf_vel)
-        #     pass
-        # else:
-        #     # SWING
-        #     pass
+        lf_drag_cost = np.linalg.norm([lf_vel[0], lf_vel[1]]) * left_force[0] 
+        rf_drag_cost = np.linalg.norm([rf_vel[0], rf_vel[1]]) * right_force[0]
+        # self.cost_dict['foot_vel'] = 0
 
         self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.02
 
         cost += self.cost_dict['foot_vel']
-        # print(self.cost_dict['foot_vel'])
         
         # Adjust slide effort compared to other actuator effort
         slide_factor = 1.0
         roll_factor = 1.0
-        # Increase ankle effort compared to other actuator effort
+
+        # Lower ankle effort compared to other actuator effort
         ankle_factor = 1.0
 
         actuator_effort = (self.data.actuator("Left_Slide").force[0] ** 2  / 200.0) * slide_factor
@@ -305,23 +284,19 @@ class SliderEnv(Env):
         actuator_effort += self.data.actuator("Left_Foot_Pitch").force[0] ** 2 / 15.0 * ankle_factor
         actuator_effort += self.data.actuator("Right_Foot_Pitch").force[0] ** 2 / 15.0 * ankle_factor
         
-        self.cost_dict["effort"] = actuator_effort / 2000.0
+        self.cost_dict["effort"] = actuator_effort / 1000.0
         cost += self.cost_dict["effort"]
 
-        # Body velocity tracking cost
-        # We split out both to ensure
-        # body_vel = self.data.sensor("body-vel").data
-        # self.cost_dict["body_vel"] = 0.0 * (self.v_ref[0] - body_vel[0]) ** 2 + 0.0 * (self.v_ref[1] - body_vel[1]) ** 2
-        # cost += self.cost_dict["body_vel"]
 
-        # Velocity tracking cost
-        forward_v = self.data.qvel[0]
-        # if abs(forward_v) < 0.2:
-        #     forward_v = 0
+        # Update position referance based on desired velocity referance
+        #self.p_ref = self.p_ref + self.v_ref * self.sim_steps * 0.002
+
+        #print(self.p_ref)
+
+        #self.cost_dict["body_vel"] = 1.0 * (self.p_ref[0] - self.data.qpos[0])**2 + 1.0 * (self.p_ref[1] - self.data.qpos[0])**2
+
         self.cost_dict["body_vel"] = 3.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 3.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
         cost += self.cost_dict["body_vel"]
-
-        # print(forward_v)
 
         # Orientation reward
         quat = np.zeros(4)
@@ -339,14 +314,14 @@ class SliderEnv(Env):
         self.cost_dict["body_orientation"] = 0.5 * np.linalg.norm([forward_rel[0], forward_rel[1]])
         cost += self.cost_dict["body_orientation"]
         
-        # print(self.cost_dict["body_orientation"])
-        # self.cost_dict["body_movement"] = np.linalg.norm(self.data.sensor("body-gyro").data))
+        #print(self.cost_dict["body_orientation"])
+        #self.cost_dict["body_movement"] = np.linalg.norm(self.data.sensor("body-gyro").data)
         self.cost_dict["body_movement"] = 0.02 * np.linalg.norm(self.data.sensor("body-gyro").data)
         self.cost_dict["body_movement"] += 0.01 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (0.8 - cost)
+        reward = (0.9 - cost)
 
         # Return reward
         return reward
