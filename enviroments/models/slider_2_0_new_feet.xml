@@ -80,6 +80,8 @@
       <site name = "Torso-rangefinder5" zaxis = "0.8 0 -1"/>
 
       <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="3.8" diaginertia="0.00413343 0.00271163 0.00231369"/>
+      
+      
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
         <inertial pos="-0.00651307 -0.000261818 7.57108e-06" quat="0.499137 0.498716 0.501955 0.500186" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
@@ -102,7 +104,7 @@
                 <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <!-- <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/> -->
                 <geom name = "Right_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
-                 <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
+                 <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.2"/>
 
               </body> 
             </body>
@@ -130,7 +132,7 @@
                 <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <!-- <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot" conaffinity = "0" contype = "0"/> -->
                 <geom name = "Left_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
-                <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
+                <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.2"/>
 
                 <!-- <geom size="0.01" pos="0.08181 0.04715 -0.0325"/>
                 <geom size="0.01" pos="0.08181 -0.04715 -0.0325" rgba="0 0 0.8 1"/>
@@ -204,8 +206,8 @@
         <gyro name = "body-gyro" site = "Torso"/>
         <accelerometer name = "body-accel" site = "Torso"/>
 
-        <touch name = "left-foot-touch" site = "Left-Foot"/>
         <touch name = "right-foot-touch" site = "Right-Foot"/>
+        <touch name = "left-foot-touch" site = "Left-Foot"/>
 
         <!-- <rangefinder name = "dist1" site="Torso-rangefinder1" cutoff = "5"/>
         <rangefinder name = "dist2" site="Torso-rangefinder2" cutoff = "5"/>

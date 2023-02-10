@@ -8,17 +8,17 @@ from stable_baselines3 import PPO
 
 env = SliderEnv()
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.005, 
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.003, 
       tensorboard_log="./trained_models/tensorboard")
 # n_steps = int(8192 * 0.5),
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "forward-vref-1-forward-effort-drag-weak-foot-12"
+trial_name = "new-feet-15"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-82", env=env)
+model =  PPO.load(model_save_path + "/model-57", env=env)
 
 forward = False
 
@@ -31,7 +31,7 @@ while True:
     # Render things
     for i in range(10000):
 
-        action, _state = model.predict(obs, deterministic=False)
+        action, _state = model.predict(obs, deterministic=True)
 
         # if i > 50:
         #     speed = 1.0

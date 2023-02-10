@@ -9,21 +9,21 @@
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
     <default class = "hip_roll_pos">
-      <position kp="50.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
+      <position kp="100.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
     </default>
 
     <default class = "hip_roll_vel">
       <!-- -144 144 -->
-      <velocity  kv="5.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
+      <velocity  kv="3.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
     </default>
 
     <default class = "hip_pitch_pos">
-      <position kp="50.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
+      <position kp="100.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
     </default>
 
     <default class = "hip_pitch_vel">
       <!-- -65 65 -->
-      <velocity  kv="5.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+      <velocity  kv="3.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
     </default>
 
 
