@@ -16,13 +16,13 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "new-feet-16"
+trial_name = "new-feet-21-omni"
 model_save_path = "./trained_models/" + trial_name
 
-# trial_load_name = "candidate-forward-4-foot-obs"
-# model_save_path_load = "./trained_models/" + trial_load_name
+trial_load_name = "new-feet-18-omni"
+model_save_path_load = "./trained_models/" + trial_load_name
 
-# model =  PPO.load(model_save_path_load + "/model-20", env=env)
+model =  PPO.load(model_save_path_load + "/model-40", env=env, learning_rate = 0.00005)
 
 # Make save path
 try:

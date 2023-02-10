@@ -23,11 +23,11 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
-        self.action_noise_scale = 0.01
-        self.action_offset_noise_scale = 0.01
+        self.action_noise_scale = 0.00
+        self.action_offset_noise_scale = 0.00
 
         self.purtrub_max = [100,100,100] # Newtons
-        self.purtrub_prob = 0.001 # Probability per timestep
+        self.purtrub_prob = 0.000 # Probability per timestep
 
         self.v_ref_change_prob = 0.0
         self.v_ref = [0,0,0]
@@ -85,8 +85,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        # self.v_ref = (np.random.uniform(0.8, -0.1), np.random.uniform(0.0, -0.0), np.random.uniform(-0.0, 0.0))
-        self.v_ref = np.array([0.5, 0.0, 0])
+        self.v_ref = (np.random.uniform(0.8, -0.5), np.random.uniform(0.5, -0.5), np.random.uniform(-0.0, 0.0))
+        # self.v_ref = np.array([0.5, 0.0, 0])
 
         self.p_ref = np.zeros(3)
 
@@ -473,19 +473,19 @@ class SliderEnv(Env):
         space = 32
 
         if(key == up):
-            self.v_ref = (1.0, 0.0, 0.0)
+            self.v_ref = (0.4, 0.0, 0.0)
             pass
 
         if(key == down):
-            self.v_ref = (-0.5, 0.0, 0.0)
+            self.v_ref = (-0.3, 0.0, 0.0)
             pass
 
         if(key == left):
-            self.v_ref = (0.0, 0.5, 0.0)
+            self.v_ref = (0.0, 0.3, 0.0)
             pass
         
         if(key == right):
-            self.v_ref = (0.0, -0.5, -0.0)
+            self.v_ref = (0.0, -0.3, -0.0)
             pass
 
         if(key == space):
