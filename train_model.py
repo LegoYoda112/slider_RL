@@ -10,13 +10,13 @@ env = SliderEnv()
 
 #  0.0003,
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0001, 
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
       tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
 # n_steps = int(8192 * 0.5),
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "forward-vref-1-forward-effort-drag-weak-foot-6"
+trial_name = "new-feet-9"
 model_save_path = "./trained_models/" + trial_name
 
 # trial_load_name = "candidate-forward-4-foot-obs"

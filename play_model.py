@@ -14,11 +14,11 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.005,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "forward-vref-1-forward-effort-drag-weak-foot-5"
+trial_name = "forward-vref-1-forward-effort-drag-weak-foot-12"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-25", env=env)
+model =  PPO.load(model_save_path + "/model-82", env=env)
 
 forward = False
 
@@ -31,7 +31,7 @@ while True:
     # Render things
     for i in range(10000):
 
-        action, _state = model.predict(obs, deterministic=True)
+        action, _state = model.predict(obs, deterministic=False)
 
         # if i > 50:
         #     speed = 1.0

@@ -9,21 +9,21 @@
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
     <default class = "hip_roll_pos">
-      <position kp="50.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
+      <position kp="100.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
     </default>
 
     <default class = "hip_roll_vel">
       <!-- -144 144 -->
-      <velocity  kv="5.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
+      <velocity  kv="3.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
     </default>
 
     <default class = "hip_pitch_pos">
-      <position kp="50.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
+      <position kp="100.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
     </default>
 
     <default class = "hip_pitch_vel">
       <!-- -65 65 -->
-      <velocity  kv="5.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+      <velocity  kv="3.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
     </default>
 
 
@@ -36,11 +36,11 @@
     </default>
 
     <default class = "foot_joint">
-        <position forcelimited="true" ctrllimited="true" kp="30.0" gear = "1" forcerange="-15 15"/>
+        <position forcelimited="true" ctrllimited="true" kp="20.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="0.5" group="1" gear ="1" forcerange = "-15 15"/>
+        <velocity forcelimited="true" kv="1.0" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 
@@ -66,7 +66,6 @@
     </body>
 
     <body name="base_link" pos="0 0 0.85">
-    <!-- 0.85 -->
       <freejoint/>
 
       <!-- <body>
@@ -101,8 +100,8 @@
               <body name="Right_Foot" pos="0 0 0">
                 <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
-                <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/>
-                <geom name = "Right_Foot_Contact" type = "box" size = "0.11 0.07 0.006" mass = "0" pos = "0 0 -0.027" rgba = "0.5 0.5 0.5 0.0"/>
+                <!-- <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/> -->
+                <geom name = "Right_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
                  <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
 
               </body> 
@@ -129,8 +128,8 @@
               <body name="Left_Foot" pos="0 0 0">
                 <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
-                <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot" conaffinity = "0" contype = "0"/>
-                <geom name = "Left_Foot_Contact" type = "box" size = "0.11 0.07 0.006" mass = "0" pos = "0 0 -0.027" rgba = "0.5 0.5 0.5 0.0"/>
+                <!-- <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot" conaffinity = "0" contype = "0"/> -->
+                <geom name = "Left_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
                 <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
 
                 <!-- <geom size="0.01" pos="0.08181 0.04715 -0.0325"/>

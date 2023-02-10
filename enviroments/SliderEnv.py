@@ -15,7 +15,7 @@ class SliderEnv(Env):
         self.max_ep_time = 20 # Seconds
 
         # Gait params
-        self.step_time = 0.6 # s - time per step
+        self.step_time = 0.7 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -23,11 +23,11 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
-        self.action_noise_scale = 0.01
-        self.action_offset_noise_scale = 0.01
+        self.action_noise_scale = 0.00
+        self.action_offset_noise_scale = 0.00
 
         self.purtrub_max = [100,100,100] # Newtons
-        self.purtrub_prob = 0.005 # Probability per timestep
+        self.purtrub_prob = 0.000 # Probability per timestep
 
         self.v_ref_change_prob = 0.0
         self.v_ref = [0,0,0]
@@ -52,7 +52,8 @@ class SliderEnv(Env):
 
         # Load a Mujoco model from the xml path
         xml_path = "enviroments/models/flat_world.xml"
-        self.model = mj.MjModel.from_xml_path(xml_path)
+        xml_path2 = "enviroments/models/flat_world_new_feet.xml"
+        self.model = mj.MjModel.from_xml_path(xml_path2)
         self.data = mj.MjData(self.model)
 
         # Make a new scene and visual context
@@ -84,7 +85,7 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        # self.v_ref = (np.random.uniform(0.5, -0.5), np.random.uniform(0.5, -0.5), np.random.uniform(-0.0, 0.0))
+        # self.v_ref = (np.random.uniform(0.8, -0.1), np.random.uniform(0.0, -0.0), np.random.uniform(-0.0, 0.0))
         self.v_ref = np.array([0.5, 0.0, 0])
 
         self.p_ref = np.zeros(3)
@@ -192,7 +193,7 @@ class SliderEnv(Env):
         self.data.ctrl[2] = action[1] * 0.8
         
         # Slide
-        self.data.ctrl[4] = action[2] * 0.1 + 0.1
+        self.data.ctrl[4] = action[2] * 0.05 + 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[6] = action[3] * 0.5
@@ -204,7 +205,7 @@ class SliderEnv(Env):
         self.data.ctrl[12] = action[6] * 0.8
         
         # Slide
-        self.data.ctrl[14] = action[7] * 0.1 + 0.1
+        self.data.ctrl[14] = action[7] * 0.05 + 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[16] = action[8] * 0.5
@@ -260,11 +261,11 @@ class SliderEnv(Env):
         # self.cost_dict['foot_vel'] = 0
 
         self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.02
-
+        # self.cost_dict['foot_vel'] += ( np.linalg.norm(lf_vel) *  np.linalg.norm(rf_vel) )**2 * 0.05
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 1.0
+        slide_factor = 5.0
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
@@ -321,7 +322,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (0.9 - cost)
+        reward = (0.5 - cost)
 
         # Return reward
         return reward
@@ -458,7 +459,7 @@ class SliderEnv(Env):
         space = 32
 
         if(key == up):
-            self.v_ref = (0.5, 0.0, 0.0)
+            self.v_ref = (1.0, 0.0, 0.0)
             pass
 
         if(key == down):
