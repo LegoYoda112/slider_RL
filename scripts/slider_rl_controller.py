@@ -8,7 +8,10 @@ from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Vector3Stamped
 from sensor_msgs.msg import JointState
 from sensor_msgs.msg import Imu
+from sensor_msgs.msg import Joy
 from std_msgs.msg import Float32MultiArray
+
+import time
 
 from stable_baselines3 import PPO
 
@@ -45,12 +48,50 @@ class SliderRLController(Node):
             10
         )
 
-        self.body_pose = self.create_subscription(
+        self.body_position_subscriber = self.create_subscription(
             PoseStamped,
             '/slider/state_estimation/body_pose',
-            self.body_pose,
+            self.body_position_callback,
             10
         )
+
+        self.joy_subscriber = self.create_subscription(
+            Joy,
+            '/joy',
+            self.joy_callback,
+            10
+        )
+
+        # Wait until we have a joint state
+        while(self.joint_states == None):
+            rclpy.spin_once(self)
+            print("waiting")
+            
+            pass
+
+        for i in range(10):
+            rclpy.spin_once(self)
+            # time.sleep(0.001)
+        
+        print(self.joint_states.position)
+        
+        self.move_time = 1.0 # seconds
+        self.move_steps = int(100.0 * self.move_time)
+
+        self.initial_position = np.array(self.joint_states.position)
+
+        # self.initial_position = 
+        self.trajectory_start = [0.0, 0.0, 0.1, 0.0, 0.0,  0.0, 0.0, 0.1, 0.0, 0.0]
+
+        # Move from initial state to begining of trajectory
+        for t in range(0, self.move_steps):
+            factor = 1 - t / self.move_steps
+            new_states = (1.0 - factor) * self.trajectory_start + factor * self.initial_position
+
+            self.pub_joint_states(new_states)
+            time.sleep(0.01)
+
+        self.action_scale = 0.0
 
         self.clock_value = 0
         self.dt = 0.01 # wrong don't do this thomas please
@@ -70,8 +111,7 @@ class SliderRLController(Node):
     def run_policy(self):
 
         self.step_time = 0.6
-
-        # self.clock_value += self.dt  # highly incorrect oh my god
+        self.clock_value += self.dt  # highly incorrect oh my god
 
         self.observation[34] = 10 * np.cos(1 * self.clock_value * 2 * np.pi / self.step_time)
         self.observation[35] = 10 * np.sin(1 * self.clock_value * 2 * np.pi / self.step_time)
@@ -86,34 +126,30 @@ class SliderRLController(Node):
         goal_msg = Float32MultiArray()
         goal_msg.data = np.zeros(10).tolist()
 
-        i = 0
-        # action = [-1.0, -1.0, -1.0, -1.0, -1.0,  -1.0, -1.0, -1.0, -1.0, -1.0]
-        for value in self.observation:
-            print(round(value, 2), i)
-            i += 1
+        # i = 0
+        # for value in self.observation:
+        #     print(round(value, 2), i)
+        #     i += 1
 
-        print()
+        # print()
+        print(action)
 
-        goal_msg.data[0] = action[0]
-        goal_msg.data[1] = action[1]
-        goal_msg.data[2] = action[2]
-        goal_msg.data[3] = action[3]
-        goal_msg.data[4] = action[4]
+        goal_msg.data[0] = action[0] * 0.3 * self.action_scale
+        goal_msg.data[1] = action[1] * 0.8 * self.action_scale
+        goal_msg.data[2] = action[2] * 0.05 * self.action_scale + 0.1
+        goal_msg.data[3] = action[3] * 0.5 * self.action_scale
+        goal_msg.data[4] = action[4] * 0.5 * self.action_scale
 
-        goal_msg.data[5] = action[5]
-        goal_msg.data[6] = action[6]
-        goal_msg.data[7] = action[7]
-        goal_msg.data[8] = action[8]
-        goal_msg.data[9] = action[9]
+        goal_msg.data[5] = action[5] * 0.3 * self.action_scale
+        goal_msg.data[6] = action[6] * 0.8 * self.action_scale
+        goal_msg.data[7] = action[7] * 0.05 * self.action_scale + 0.1
+        goal_msg.data[8] = action[8] * 0.5 * self.action_scale
+        goal_msg.data[9] = action[9] * 0.5 * self.action_scale
 
         self.position_goal_publisher.publish(goal_msg)
-        # print(action)
-        # do the thing
 
 
     def joint_state_callback(self, msg):
-
-        self.clock_value += 0.005
 
         # 0 "left_roll"
         # 1 "left_pitch"
@@ -146,17 +182,17 @@ class SliderRLController(Node):
         self.observation[25] = msg.velocity[6] # Right pitch velocity
 
 
-        self.observation[26] = -msg.position[4] # Left foot pitch length
-        self.observation[27] = -msg.velocity[4] # Left foot pitch velocity
+        self.observation[26] = msg.position[4] # Left foot pitch length
+        self.observation[27] = msg.velocity[4] # Left foot pitch velocity
 
-        self.observation[28] = -msg.position[9] # Right foot pitch length
-        self.observation[29] = - msg.velocity[9] # Right foot pitch velocity
+        self.observation[28] = msg.position[9] # Right foot pitch length
+        self.observation[29] = msg.velocity[9] # Right foot pitch velocity
 
         self.observation[30] = msg.position[3] # Left foot roll length
         self.observation[31] = msg.velocity[3] # Left foot roll velocity
 
-        self.observation[32] = -msg.position[8] # Right foot roll length
-        self.observation[33] = -msg.velocity[8] # Right foot roll velocity
+        self.observation[32] = msg.position[8] # Right foot roll length
+        self.observation[33] = msg.velocity[8] # Right foot roll velocity
 
         pass
 
@@ -164,7 +200,7 @@ class SliderRLController(Node):
 
         # Set body linear acceleration
         self.observation[4] = msg.linear_acceleration.y / 2.0
-        self.observation[5] = msg.linear_acceleration.x / 2.0  # might be negative
+        self.observation[5] = msg.linear_acceleration.x / 2.0
         self.observation[6] = msg.linear_acceleration.z / 2.0
 
         # Set body angular velocity
@@ -173,24 +209,29 @@ class SliderRLController(Node):
         self.observation[9] = msg.angular_velocity.z / 2.0
 
         # Set body orientation
-        self.observation[10] = msg.orientation.w * 1
-        self.observation[11] = msg.orientation.x * 1
-        self.observation[12] = msg.orientation.y * 1
-        self.observation[13] = msg.orientation.z * 1
+        self.observation[10] = msg.orientation.w 
+        self.observation[11] = msg.orientation.x
+        self.observation[12] = msg.orientation.y
+        self.observation[13] = msg.orientation.z 
 
     def body_velocity_callback(self, msg):
         
-        self.observation[1] = msg.vector.x * 1.5
-        self.observation[2] = msg.vector.y * 1.5
-        self.observation[3] = msg.vector.z * 1.5
+        self.observation[1] = msg.vector.x
+        self.observation[2] = msg.vector.y
+        self.observation[3] = msg.vector.z
 
         pass
 
-    def body_pose(self, msg):
+    def body_position_callback(self, msg):
         
         # Set body height
         self.observation[0] = msg.pose.position.z * 0.0
         pass
+
+    def joy_callback(self, msg):
+        print(msg.axes)
+
+        self.action_scale = 0.0
 
 def main(args=None):
     rclpy.init(args=args)
