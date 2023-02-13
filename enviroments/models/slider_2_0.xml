@@ -80,7 +80,7 @@
       <site name = "Torso-rangefinder4" zaxis = "0.6 0 -1"/>
       <site name = "Torso-rangefinder5" zaxis = "0.8 0 -1"/>
 
-      <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="3.8" diaginertia="0.00413343 0.00271163 0.00231369"/>
+      <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="1.0" diaginertia="0.00413343 0.00271163 0.00231369"/>
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
         <inertial pos="-0.00651307 -0.000261818 7.57108e-06" quat="0.499137 0.498716 0.501955 0.500186" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>

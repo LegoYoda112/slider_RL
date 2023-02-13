@@ -15,7 +15,7 @@ class SliderEnv(Env):
         self.max_ep_time = 20 # Seconds
 
         # Gait params
-        self.step_time = 0.7 # s - time per step
+        self.step_time = 0.6 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -53,7 +53,7 @@ class SliderEnv(Env):
         # Load a Mujoco model from the xml path
         xml_path = "enviroments/models/flat_world.xml"
         xml_path2 = "enviroments/models/flat_world_new_feet.xml"
-        self.model = mj.MjModel.from_xml_path(xml_path2)
+        self.model = mj.MjModel.from_xml_path(xml_path)
         self.data = mj.MjData(self.model)
 
         # Make a new scene and visual context
@@ -95,19 +95,19 @@ class SliderEnv(Env):
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
         # Randomize starting position and velocity
-        self.data.qpos[0] = np.random.uniform(-3, -2)+ 2
-        self.data.qvel[0] = np.random.uniform(0.0, 0.4)
+        #self.data.qpos[0] = np.random.uniform(-3, -2)+ 2
+        #self.data.qvel[0] = np.random.uniform(0.0, 0.4)
 
-        self.data.qpos[1] = np.random.uniform(-2, 2)
-        self.data.qvel[1] = np.random.uniform(-0.2, 0.2)
+        #self.data.qpos[1] = np.random.uniform(-2, 2)
+        #self.data.qvel[1] = np.random.uniform(-0.2, 0.2)
 
         #robot_starting_height = 0.4
         #self.data.qpos[2] = robot_starting_height
         
         # Joint randomization
         # TODO: Do this properly
-        self.data.qpos[7:16] = np.random.uniform(-0.05, 0.05, size = 9)
-        self.data.qvel[7:16] = np.random.uniform(-0.1, 0.1, size = 9)
+        # self.data.qpos[7:16] = np.random.uniform(-0.05, 0.05, size = 9)
+        # self.data.qvel[7:16] = np.random.uniform(-0.1, 0.1, size = 9)
 
         observation = self.observe()
 
@@ -246,7 +246,7 @@ class SliderEnv(Env):
 
     # Calculate current actuator power
     def actuator_power(self, actuator_name):
-        return abs(self.data.actuator(actuator_name).force[0] * self.data.actuator(actuator_name).velocity[0])
+        return abs(self.data.actuator(actuator_name).force[0] * self.data.actuator(actuator_name).velocity[0] * 0.0)
 
     def compute_reward(self):
         cost = 0
@@ -364,32 +364,36 @@ class SliderEnv(Env):
 
         # ======= Body sensors ======
         # Body height
-        observation.append(qpos[2])
+        observation.append(qpos[2] * 0.0)
 
         # Body velocity
-        observation.append(qvel[0])
-        observation.append(qvel[1])
-        observation.append(qvel[2])
+        observation.append(qvel[0] * 1)
+        observation.append(qvel[1] * 1)
+        observation.append(qvel[2] * 1)
 
         # Body acceleration
         observation.append(body_accel[0] / 2.0)
         observation.append(body_accel[1] / 2.0)
         observation.append(body_accel[2] / 2.0)
 
+        # observation.append(0)
+        # observation.append(0)
+        # observation.append(4.0)
+
         # Body gyro
-        observation.append(body_gyro[0] / 2.0)
-        observation.append(body_gyro[1] / 2.0)
-        observation.append(body_gyro[2] / 2.0)
+        observation.append(body_gyro[0] * 0.0)
+        observation.append(body_gyro[1] * 0.0)
+        observation.append(body_gyro[2] * 0.0)
 
         # Body orientation
         quat = np.zeros(4)
         mj.mju_mat2Quat(quat, self.data.body("base_link").xmat)
         # print(quat)
         
-        observation.append(quat[0])
-        observation.append(quat[1])
-        observation.append(quat[2])
-        observation.append(quat[3])
+        observation.append(quat[0] * 0.0)
+        observation.append(quat[1] * 0.0)
+        observation.append(quat[2] * 0.0)
+        observation.append(quat[3] * 0.0)
 
         # print(self.data.sensor("dist1").data[0])
         # observation.append(self.data.sensor("dist1").data[0])
@@ -399,45 +403,45 @@ class SliderEnv(Env):
         # observation.append(self.data.sensor("dist5").data[0])
 
         # ====== Actuator states ====
-        observation.append(left_slide.length)
-        observation.append(left_slide.velocity[0])
+        observation.append(left_slide.length) # 14
+        observation.append(left_slide.velocity[0] * 1.0)
         # observation.append(left_slide.force / 200.0)
 
         observation.append(right_slide.length)
-        observation.append(right_slide.velocity[0])
+        observation.append(right_slide.velocity[0] * 1.0)
         # observation.append(right_slide.force / 200.0)
 
         observation.append(left_roll.length)
-        observation.append(left_roll.velocity[0])
+        observation.append(left_roll.velocity[0] * 1.0)
         # observation.append(left_roll.force / 144.0)
 
         observation.append(right_roll.length)
-        observation.append(right_roll.velocity[0])
+        observation.append(right_roll.velocity[0] * 1.0)
         # observation.append(right_roll.force / 144.0)
 
         observation.append(left_pitch.length)
-        observation.append(left_pitch.velocity[0])
+        observation.append(left_pitch.velocity[0] * 1.0)
         # observation.append(left_pitch.force / 65.0)
 
         observation.append(right_pitch.length)
-        observation.append(right_pitch.velocity[0])
+        observation.append(right_pitch.velocity[0] * 1.0)
         # observation.append(right_pitch.force / 65.0)
 
         # ===== FOOT =====
         observation.append(left_foot_pitch.length)
-        observation.append(left_foot_pitch.velocity[0])
+        observation.append(left_foot_pitch.velocity[0] * 1.0)
         # observation.append(left_foot_pitch.force / 15.0)
 
         observation.append(right_foot_pitch.length)
-        observation.append(right_foot_pitch.velocity[0])
+        observation.append(right_foot_pitch.velocity[0] * 1.0)
         # observation.append(right_foot_pitch.force / 15.0)
 
         observation.append(left_foot_roll.length)
-        observation.append(left_foot_roll.velocity[0])
+        observation.append(left_foot_roll.velocity[0] * 1.0)
        # observation.append(left_foot_roll.force / 15.0)
 
         observation.append(right_foot_roll.length)
-        observation.append(right_foot_roll.velocity[0])
+        observation.append(right_foot_roll.velocity[0] * 1.0)
         # observation.append(right_foot_roll.force / 15.0)
 
         twopi = 2 * np.pi

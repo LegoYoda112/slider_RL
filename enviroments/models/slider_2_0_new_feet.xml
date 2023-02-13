@@ -4,7 +4,7 @@
   
   <!-- Default values -->
   <default>
-    <joint limited = "true" damping = "2.0" armature = "0"/>
+    <joint limited = "true" damping = "0.0" armature = "0"/>
     <position forcelimited = "true" forcerange = "-30 30" />
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
