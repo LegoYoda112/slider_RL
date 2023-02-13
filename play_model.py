@@ -5,6 +5,7 @@ import glob
 
 from stable_baselines3 import PPO
 
+
 env = SliderEnv()
 
 model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0005, 
