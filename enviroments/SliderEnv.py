@@ -364,7 +364,7 @@ class SliderEnv(Env):
 
         # ======= Body sensors ======
         # Body height
-        observation.append(qpos[2] * 0.0)
+        observation.append(qpos[2] * 1.0)
 
         # Body velocity
         observation.append(qvel[0] * 1)
@@ -381,19 +381,19 @@ class SliderEnv(Env):
         # observation.append(4.0)
 
         # Body gyro
-        observation.append(body_gyro[0] * 0.0)
-        observation.append(body_gyro[1] * 0.0)
-        observation.append(body_gyro[2] * 0.0)
+        observation.append(body_gyro[0] * 1.0)
+        observation.append(body_gyro[1] * 1.0)
+        observation.append(body_gyro[2] * 1.0)
 
         # Body orientation
         quat = np.zeros(4)
         mj.mju_mat2Quat(quat, self.data.body("base_link").xmat)
         # print(quat)
         
-        observation.append(quat[0] * 0.0)
-        observation.append(quat[1] * 0.0)
-        observation.append(quat[2] * 0.0)
-        observation.append(quat[3] * 0.0)
+        observation.append(quat[0] * 1.0)
+        observation.append(quat[1] * 1.0)
+        observation.append(quat[2] * 1.0)
+        observation.append(quat[3] * 1.0)
 
         # print(self.data.sensor("dist1").data[0])
         # observation.append(self.data.sensor("dist1").data[0])

@@ -4,7 +4,7 @@
   
   <!-- Default values -->
   <default>
-    <joint limited = "true" damping = "2.0" armature = "0"/>
+    <joint limited = "true" damping = "0.0" armature = "0"/>
     <position forcelimited = "true" forcerange = "-30 30" />
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
@@ -36,7 +36,7 @@
     </default>
 
     <default class = "foot_joint">
-        <position forcelimited="true" ctrllimited="true" kp="30.0" gear = "1" forcerange="-15 15"/>
+        <position forcelimited="true" ctrllimited="true" kp="20.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
