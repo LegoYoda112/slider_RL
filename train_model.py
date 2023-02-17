@@ -10,19 +10,19 @@ env = SliderEnv()
 
 #  0.0003,
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0001, 
       tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
 # n_steps = int(8192 * 0.5),
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "new-feet-21-omni-back-to-old-feet"
+trial_name = "old-feet-no-damping-6"
 model_save_path = "./trained_models/" + trial_name
 
-trial_load_name = "new-feet-20-omni"
-model_save_path_load = "./trained_models/" + trial_load_name
+# trial_load_name = "new-feet-20-omni"
+# model_save_path_load = "./trained_models/" + trial_load_name
 
-model =  PPO.load(model_save_path_load + "/model-53", env=env, learning_rate = 0.0001)
+# model =  PPO.load(model_save_path_load + "/model-53", env=env, learning_rate = 0.0001)
 
 # Make save path
 try:

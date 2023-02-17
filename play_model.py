@@ -14,11 +14,11 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "new-feet-21-omni-back-to-old-feet"
+trial_name = "old-feet-no-damping-5"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-96", env=env)
+model =  PPO.load(model_save_path + "/model-50", env=env)
 
 forward = False
 
@@ -50,10 +50,10 @@ while True:
 
         action, _state = model.predict(obs, deterministic=True)
 
-        i = 0
-        for value in obs:
-            print(round(value, 2), i)
-            i += 1
+        # i = 0
+        # for value in obs:
+        #     print(round(value, 2), i)
+        #     i += 1
 
         # print()
 
@@ -85,7 +85,7 @@ while True:
         # if i > 2 * np.pi * 150:
         #     speed = 0.0
 
-        env.v_ref = [0.0, 0.0]
+        # env.v_ref = [0.5, 0.0]
 
         # if forward:
         #     env.v_ref = [0.8, 0]
