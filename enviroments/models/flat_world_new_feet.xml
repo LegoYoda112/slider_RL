@@ -1,0 +1,64 @@
+<mujoco>
+    <!-- Simulation properties -->
+    <compiler texturedir="../meshes/"  
+        meshdir="../meshes/" balanceinertia="true"/>
+
+    <statistic extent="1.5" meansize="0.1"/>
+
+    <option jacobian="auto">
+        <flag multiccd="enable"/>
+    </option>
+
+    <option viscosity="0.0"/>
+
+    <!-- Rendering properties -->
+    <visual>
+        <rgba haze="0.1 0.1 0.1 1"/>
+        <quality shadowsize="4096"/>
+        <map stiffness="700" shadowscale="0.5" fogstart="10" fogend="15" zfar="40" haze="0.3"/>
+    </visual>
+
+    <!-- Assets -->
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/>
+        <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2"
+      width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>
+
+        <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
+    </asset>
+
+    <asset>
+        <hfield name="field" file="snowdon.png" size = "10 10 0.4 1"/>
+    </asset>
+
+    <!-- Include slider urdf -->
+    <include file="slider_2_0_new_feet.xml"/>
+
+    <!-- World description -->
+    <worldbody>
+        <!-- Lighting -->
+        <light directional="true" diffuse=".4 .4 .4" specular="0.1 0.1 0.1" pos="0 0 5.0" dir="1 0 -1" castshadow="true"/>
+        <light directional="true" diffuse=".6 .6 .6" specular="0.2 0.2 0.2" pos="0 0 4" dir="0 0 -1"/>
+
+        <!-- Flat ground plane -->
+        <!-- <geom type="hfield" hfield="field" pos = "0 0 -0.2"/> -->
+
+        <geom name="ground" type="plane" size="0 0 1" pos="0 0 0.1" quat="1 0 0 0" material="matplane" condim="1"/>
+
+        <!-- <geom name="obstical2" type = "box" size = "1 5 1" pos = "8 0 -0.88"/> -->
+
+        <!-- <geom name="obstical3" type = "box" size = "2 5 1" pos = "12 0 -0.87"/> -->
+
+        <!-- <geom type = "box" size = "0.2 0.2 1" pos = "1.2 1.1 -0.87" />
+        <geom type = "box" size = "0.2 0.2 1" pos = "0.1 0.5 -0.87" />
+        <geom type = "box" size = "0.2 0.2 1" pos = "0.6 0.1 -0.87" />
+        <geom type = "box" size = "0.2 0.2 1" pos = "2 2.1 -0.87" />
+        <geom type = "box" size = "0.2 0.2 1" pos = "0.2 0 -0.87" /> -->
+
+        <!-- <geom name="obstical4" type = "box" size = "1 5 1" pos = "-0.0 0 -0.88" />
+        <geom name="obstical5" type = "box" size = "0.73 5 1" pos = "-0.0 0 -0.86"/>
+        <geom name="obstical6" type = "box" size = "0.3 5 1" pos = "-0.0 0 -0.84"/> -->
+
+    </worldbody>
+
+</mujoco>
