@@ -24,6 +24,14 @@ class SliderRLController(Node):
 
         self.get_logger().info("Starting RL controller")
 
+        self.observation = np.zeros(40)
+
+        trial_name = ""
+        model_save_path = "/home/thoma/Documents/ros2_ws/src/slider_RL/trained_models" + trial_name
+
+        self.model = PPO.load(model_save_path + "/model-96")
+
+
         self.position_goal_publisher = self.create_publisher(
             Float32MultiArray, '/slider/control/motor/position_goals', 10)
 
@@ -62,55 +70,57 @@ class SliderRLController(Node):
             10
         )
 
-        # Wait until we have a joint state
-        while(self.joint_states == None):
-            rclpy.spin_once(self)
-            print("waiting")
+    # self.joint_states = None
+
+        # # Wait until we have a joint state
+        # while(self.joint_states == None):
+        #     rclpy.spin_once(self)
+        #     print("waiting")
             
-            pass
+        #     pass
 
-        for i in range(10):
-            rclpy.spin_once(self)
-            # time.sleep(0.001)
+        # for i in range(100):
+        #     rclpy.spin_once(self)
+        #     time.sleep(0.001)
         
-        print(self.joint_states.position)
+        # print(self.joint_states.position)
         
-        self.move_time = 1.0 # seconds
-        self.move_steps = int(100.0 * self.move_time)
+        # self.move_time = 2.0 # seconds
+        # self.move_steps = int(100.0 * self.move_time)
 
-        self.initial_position = np.array(self.joint_states.position)
+        # self.initial_position = np.array(self.joint_states.position)
 
-        # self.initial_position = 
-        self.trajectory_start = [0.0, 0.0, 0.1, 0.0, 0.0,  0.0, 0.0, 0.1, 0.0, 0.0]
+        # self.trajectory_start = np.array([0.0, 0.0, 0.1, 0.0, 0.0,  0.0, 0.0, 0.1, 0.0, 0.0])
 
-        # Move from initial state to begining of trajectory
-        for t in range(0, self.move_steps):
-            factor = 1 - t / self.move_steps
-            new_states = (1.0 - factor) * self.trajectory_start + factor * self.initial_position
+        # # Move from initial state to begining of trajectory
+        # for t in range(0, self.move_steps):
+        #     factor = 1 - t / self.move_steps
+        #     new_states = (1.0 - factor) * self.trajectory_start + factor * self.initial_position
 
-            self.pub_joint_states(new_states)
-            time.sleep(0.01)
+        #     self.pub_joint_states(new_states)
+        #     time.sleep(0.01)
 
         self.action_scale = 0.0
 
         self.clock_value = 0
-        self.dt = 0.01 # wrong don't do this thomas please
+        self.dt = 0.02 # wrong don't do this thomas please
 
-        self.observation = np.zeros(40)
+        self.abort = False
 
         # /Users/thomasg/Documents/nogithub/ros2-ws/src/slider_RL/trained_models
-
-        trial_name = "new-feet-21-omni-back-to-old-feet"
-        model_save_path = "/Users/thomasg/Documents/nogithub/ros2-ws/src/slider_RL/trained_models/" + trial_name
-
-        self.model = PPO.load(model_save_path + "/model-96")
+        # /home/thoma/Documents/ros2_ws/src/slider_RL/trained_models
 
         self.create_timer(self.dt, self.run_policy)
 
+    def pub_joint_states(self, array):
+        msg = Float32MultiArray()
+        msg.data = list(array)
+
+        self.position_goal_publisher.publish(msg)
 
     def run_policy(self):
 
-        self.step_time = 0.6
+        self.step_time = 0.7
         self.clock_value += self.dt  # highly incorrect oh my god
 
         self.observation[34] = 10 * np.cos(1 * self.clock_value * 2 * np.pi / self.step_time)
@@ -118,7 +128,7 @@ class SliderRLController(Node):
         self.observation[36] = 10 * np.cos(1 * self.clock_value * 4 * np.pi / self.step_time)
         self.observation[37] = 10 * np.sin(1 * self.clock_value * 4 * np.pi / self.step_time)
 
-        self.observation[38] = 0.0 # vref X
+        self.observation[38] = 0.8 # vref X
         self.observation[39] = 0.0 # vref Y
 
         action = self.model.predict(self.observation, deterministic=True)[0]
@@ -132,7 +142,7 @@ class SliderRLController(Node):
         #     i += 1
 
         # print()
-        print(action)
+        # print(action)
 
         goal_msg.data[0] = action[0] * 0.3 * self.action_scale
         goal_msg.data[1] = action[1] * 0.8 * self.action_scale
@@ -143,13 +153,21 @@ class SliderRLController(Node):
         goal_msg.data[5] = action[5] * 0.3 * self.action_scale
         goal_msg.data[6] = action[6] * 0.8 * self.action_scale
         goal_msg.data[7] = action[7] * 0.05 * self.action_scale + 0.1
-        goal_msg.data[8] = action[8] * 0.5 * self.action_scale
+        goal_msg.data[8] = - action[8] * 0.5 * self.action_scale # Left Foot Pitch
         goal_msg.data[9] = action[9] * 0.5 * self.action_scale
 
-        self.position_goal_publisher.publish(goal_msg)
+        print(goal_msg.data)
+
+        if(self.abort == False):
+            self.position_goal_publisher.publish(goal_msg)
+            pass
+        else:
+            self.get_logger().error("STOPPED")
 
 
     def joint_state_callback(self, msg):
+        
+        self.joint_states = msg
 
         # 0 "left_roll"
         # 1 "left_pitch"
@@ -164,7 +182,7 @@ class SliderRLController(Node):
         # 9 "right_foot_pitch"
         
         self.observation[14] = msg.position[2] # Left slide length
-        self.observation[15] =  msg.velocity[2] # Left slide velocity
+        self.observation[15] = msg.velocity[2] # Left slide velocity
 
         self.observation[16] = msg.position[7] # Right slide length
         self.observation[17] = msg.velocity[7] # Right slide velocity
@@ -182,8 +200,8 @@ class SliderRLController(Node):
         self.observation[25] = msg.velocity[6] # Right pitch velocity
 
 
-        self.observation[26] = msg.position[4] # Left foot pitch length
-        self.observation[27] = msg.velocity[4] # Left foot pitch velocity
+        self.observation[26] = -msg.position[4] # Left foot pitch length
+        self.observation[27] = -msg.velocity[4] # Left foot pitch velocity
 
         self.observation[28] = msg.position[9] # Right foot pitch length
         self.observation[29] = msg.velocity[9] # Right foot pitch velocity
@@ -229,9 +247,10 @@ class SliderRLController(Node):
         pass
 
     def joy_callback(self, msg):
-        print(msg.axes)
+        self.action_scale = 1 - (msg.axes[5] + 1) / 2.0
 
-        self.action_scale = 0.0
+        if(msg.buttons[1]):
+            self.abort = True
 
 def main(args=None):
     rclpy.init(args=args)
