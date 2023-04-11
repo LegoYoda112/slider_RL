@@ -14,30 +14,20 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "old-feet-no-damping-5"
+trial_name = "2022-feet-candidate-6-omni"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-50", env=env)
+model =  PPO.load(model_save_path + "/model-12", env=env)
 
 forward = False
 
 speed = 1.0
 
-target_x = 5.0
-target_y = 5.0
+target_x = 0.0
+target_y = 0.0
 
 i = 0
-
-
-# import csv
-
-# # open the file in the write mode
-# f = open('test.csv', 'w')
-
-# # create the csv writer
-# writer = csv.writer(f)
-
 
 
 while True:
@@ -85,7 +75,7 @@ while True:
         # if i > 2 * np.pi * 150:
         #     speed = 0.0
 
-        # env.v_ref = [0.5, 0.0]
+        # env.v_ref = [0.8, 0.0]
 
         # if forward:
         #     env.v_ref = [0.8, 0]
@@ -99,16 +89,16 @@ while True:
         # env.v_ref = [(np.sin(i / 100)) * 0.4 + 0.4, 0.0, 0.0
 
         # if(abs(p_x - target_x) < 0.1 and abs(p_y - target_y) < 0.1):
-        #     target_x = np.random.uniform(-5, 5)
-        #     target_y = np.random.uniform(-5, 5)
+        #     target_x = np.random.uniform(-1, 1)
+        #     target_y = np.random.uniform(-1, 1)
 
         
         # print((target_x - p_x), (target_y - p_y))
 
-        # env.v_ref = [max(-0.6, min(0.6, (target_x - p_x) * 1.0)), max( -0.4, min(0.4, (target_y - p_y) * 1.0)), 0.0]
-        # env.v_ref = [0.2, 0, 0]
+        # env.v_ref = [max(-0.3, min(0.3, (target_x - p_x) * 1.0)), max( -0.4, min(0.4, (target_y - p_y) * 1.0)), 0.0]
+       #  env.v_ref = [0.2, 0, 0]
         # env.v_ref = [(np.cos(i / 150))/2.0 * speed, (np.sin(i / 150))/2.0 * speed, 0.0]
-            #print("SWITCH")
+        #    print("SWITCH")
 
         obs, reward, done, info = env.step(action)
         env.render()
@@ -126,7 +116,7 @@ while True:
         # if(done):
         #     env.reset()
 
-        time.sleep(0.015)
+        time.sleep(0.01)
         # input()
         # time.sleep(0.1)
 
