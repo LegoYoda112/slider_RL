@@ -8,22 +8,22 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 env = SliderEnv()
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0001, 
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0002, 
       tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
 
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "2022-feet-candidate-6-omni"
+trial_name = "new_model_new_obs_forward-6"
 model_save_path = "./trained_models/" + trial_name
 
 load = True
 
 if(load): 
-    trial_load_name = "2022-feet-candidate-5-omni"
+    trial_load_name = "new_model_new_obs_forward-5"
     model_save_path_load = "./trained_models/" + trial_load_name
 
-    model =  PPO.load(model_save_path_load + "/model-59", env=env, learning_rate = 0.0001)
+    model =  PPO.load(model_save_path_load + "/model-50", env=env, learning_rate = 0.0001)
 
 # Make save path
 try:

@@ -40,7 +40,7 @@
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="5.0" group="1" gear ="1" forcerange = "-15 15"/>
+        <velocity forcelimited="true" kv="6.0" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 

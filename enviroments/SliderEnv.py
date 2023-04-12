@@ -26,7 +26,7 @@ class SliderEnv(Env):
         self.action_noise_scale = 0.01
         self.action_offset_noise_scale = 0.01
 
-        self.purtrub_max = [50,50,50] # Newtons
+        self.purtrub_max = [100,100,100] # Newtons
         self.purtrub_prob = 0.001 # Probability per timestep
 
         self.v_ref_change_prob = 0.001
@@ -85,8 +85,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        self.v_ref = (np.random.uniform(0.5, 0.0), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
-        # self.v_ref = (0.5, 0.0, 0.0)
+        # self.v_ref = (np.random.uniform(0.5, 0.0), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
+        self.v_ref = (0.5, 0.0, 0.0)
 
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
@@ -226,7 +226,7 @@ class SliderEnv(Env):
         lf_drag_cost = np.linalg.norm([lf_vel[0], lf_vel[1]]) * left_force[0] 
         rf_drag_cost = np.linalg.norm([rf_vel[0], rf_vel[1]]) * right_force[0]
 
-        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.02
+        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.015
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
@@ -234,7 +234,7 @@ class SliderEnv(Env):
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
-        ankle_factor = 1.0
+        ankle_factor = 2.0
 
         actuator_effort = self.actuator_power("Left_Slide") ** 2 * slide_factor
         actuator_effort += self.actuator_power("Right_Slide") ** 2 * slide_factor
@@ -269,128 +269,47 @@ class SliderEnv(Env):
         forward_rel = np.zeros(3)
         mj.mju_rotVecQuat(forward_rel, forward, quat)
 
-        self.cost_dict["body_orientation"] = 0.1 * np.linalg.norm([up_rel[0], up_rel[1]])
+        self.cost_dict["body_orientation"] = 0.5 * np.linalg.norm([up_rel[0], up_rel[1]])
         self.cost_dict["body_orientation"] = 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]])
         cost += self.cost_dict["body_orientation"]
         
         # Body movement cost
-        self.cost_dict["body_movement"] = 0.01 * np.linalg.norm(self.data.sensor("body-gyro").data)
-        self.cost_dict["body_movement"] += 0.005 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
+        self.cost_dict["body_movement"] = 0.02 * np.linalg.norm(self.data.sensor("body-gyro").data)
+        self.cost_dict["body_movement"] += 0.01 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (0.6 - cost)
+        reward = (0.5 - cost)
 
         # Return reward
         return reward
 
     def observe(self):
-        observation = []
-
         qpos = self.data.qpos
         qvel = self.data.qvel
-        body_accel = self.data.sensor("body-accel").data
-        body_gyro = self.data.sensor("body-gyro").data
 
-        left_slide = self.data.actuator("Left_Slide")
-        right_slide = self.data.actuator("Right_Slide")
+        pos_noise_scale = np.random.normal(size=(15)) * 0.1
+        vel_noise_scale = np.random.normal(size=(16)) * 0.3
 
-        left_roll = self.data.actuator("Left_Roll")
-        right_roll = self.data.actuator("Right_Roll")
-
-        left_pitch = self.data.actuator("Left_Pitch")
-        right_pitch = self.data.actuator("Right_Pitch")
-        
-        left_foot_roll = self.data.actuator("Left_Foot_Roll")
-        right_foot_roll = self.data.actuator("Right_Foot_Roll")
-
-        left_foot_pitch = self.data.actuator("Left_Foot_Pitch")
-        right_foot_pitch = self.data.actuator("Right_Foot_Pitch")
-        
-        # ======= Body sensors ======
-        # Body height
-        observation.append(qpos[2] * 1.0)
-
-        # Body velocity
-        observation.append(qvel[0] * 1)
-        observation.append(qvel[1] * 1)
-        observation.append(qvel[2] * 1)
-
-        # Body acceleration
-        observation.append(body_accel[0] / 2.0)
-        observation.append(body_accel[1] / 2.0)
-        observation.append(body_accel[2] / 2.0)
-
-        # Body gyro
-        observation.append(body_gyro[0] * 1.0)
-        observation.append(body_gyro[1] * 1.0)
-        observation.append(body_gyro[2] * 1.0)
-
-        # Body orientation
-        quat = np.zeros(4)
-        mj.mju_mat2Quat(quat, self.data.body("base_link").xmat)
-        # print(quat)
-        
-        observation.append(quat[0] * 1.0)
-        observation.append(quat[1] * 1.0)
-        observation.append(quat[2] * 1.0)
-        observation.append(quat[3] * 1.0)
-
-        # ====== Actuator states ====
-        observation.append(left_slide.length[0]) # 14
-        observation.append(left_slide.velocity[0] * 1.0)
-        # observation.append(left_slide.force / 200.0)
-
-        observation.append(right_slide.length[0])
-        observation.append(right_slide.velocity[0] * 1.0)
-        # observation.append(right_slide.force / 200.0)
-
-        observation.append(left_roll.length[0])
-        observation.append(left_roll.velocity[0] * 1.0)
-        # observation.append(left_roll.force / 144.0)
-
-        observation.append(right_roll.length[0])
-        observation.append(right_roll.velocity[0] * 1.0)
-        # observation.append(right_roll.force / 144.0)
-
-        observation.append(left_pitch.length[0])
-        observation.append(left_pitch.velocity[0] * 1.0)
-        # observation.append(left_pitch.force / 65.0)
-
-        observation.append(right_pitch.length[0])
-        observation.append(right_pitch.velocity[0] * 1.0)
-        # observation.append(right_pitch.force / 65.0)
-
-        # ===== FOOT =====
-        observation.append(left_foot_pitch.length[0])
-        observation.append(left_foot_pitch.velocity[0] * 1.0)
-        # observation.append(left_foot_pitch.force / 15.0)
-
-        observation.append(right_foot_pitch.length[0])
-        observation.append(right_foot_pitch.velocity[0] * 1.0)
-        # observation.append(right_foot_pitch.force / 15.0)
-
-        observation.append(left_foot_roll.length[0])
-        observation.append(left_foot_roll.velocity[0] * 1.0)
-       # observation.append(left_foot_roll.force / 15.0)
-
-        observation.append(right_foot_roll.length[0])
-        observation.append(right_foot_roll.velocity[0] * 1.0)
-        # observation.append(right_foot_roll.force / 15.0)
+        # === Full state === (minus x and y position)
+        state = np.concatenate((qpos[2:] + pos_noise_scale, qvel + vel_noise_scale))
 
         # === CLOCK ===
-        observation.append(10 * np.cos(1 * self.cycle_clock * 2 * np.pi / self.step_time))
-        observation.append(10 * np.sin(1 * self.cycle_clock * 2 * np.pi / self.step_time))
+        clock = []
 
-        observation.append(10 * np.cos(1 * self.cycle_clock * 4 * np.pi / self.step_time))
-        observation.append(10 * np.sin(1 * self.cycle_clock * 4 * np.pi / self.step_time))
+        clock.append(10 * np.cos(1 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.sin(1 * self.cycle_clock * 2 * np.pi / self.step_time))
 
+        #clock.append(10 * np.cos(1 * self.cycle_clock * 4 * np.pi / self.step_time))
+        #clock.append(10 * np.sin(1 * self.cycle_clock * 4 * np.pi / self.step_time))
 
         # ==== VREF ====
-        observation.append(self.v_ref[0])
-        observation.append(self.v_ref[1])
+        vref = []
 
-        observation = np.array(observation, dtype = np.float16)
+        vref.append(self.v_ref[0])
+        vref.append(self.v_ref[1])
+
+        observation = np.array(np.concatenate((state, clock, vref)), dtype = np.float16)
 
         return observation
 
