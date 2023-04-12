@@ -8,16 +8,16 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 env = SliderEnv()
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0002, 
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
       tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
 
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "new_model_new_obs_forward-6"
+trial_name = "new_model_new_obs_forward-10"
 model_save_path = "./trained_models/" + trial_name
 
-load = True
+load = False
 
 if(load): 
     trial_load_name = "new_model_new_obs_forward-5"

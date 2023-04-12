@@ -32,6 +32,11 @@ class SliderEnv(Env):
         self.v_ref_change_prob = 0.001
         self.v_ref = [0,0,0]
 
+        # ======= STATE HISTORY =====
+        self.state_size = 31
+        self.state_history_length = 3 # states 
+        self.state_history = np.zeros(self.state_size * self.state_history_length)
+
         # ======= MUJOCO INIT =======
         self.cam = mj.MjvCamera()
         self.opt = mj.MjvOption()
@@ -91,11 +96,14 @@ class SliderEnv(Env):
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
         # Randomize starting position and velocity
-        self.data.qpos[0] = np.random.uniform(-1, 1)
+        # self.data.qpos[0] = np.random.uniform(-1, 1)
+        self.data.qpos[0] = -0.5
         self.data.qvel[0] = np.random.uniform(0.2, 0.2)
 
-        self.data.qpos[1] = np.random.uniform(-1, 1)
+        self.data.qpos[1] = np.random.uniform(-0.2, 0.2)
         self.data.qvel[1] = np.random.uniform(-0.2, 0.2)
+
+        self.state_history = np.zeros(self.state_size * self.state_history_length)
 
         #robot_starting_height = 0.4
         #self.data.qpos[2] = robot_starting_height
@@ -289,10 +297,15 @@ class SliderEnv(Env):
         qvel = self.data.qvel
 
         pos_noise_scale = np.random.normal(size=(15)) * 0.1
-        vel_noise_scale = np.random.normal(size=(16)) * 0.3
+        vel_noise_scale = np.random.normal(size=(16)) * 0.1
 
         # === Full state === (minus x and y position)
         state = np.concatenate((qpos[2:] + pos_noise_scale, qvel + vel_noise_scale))
+
+        # Shuffle state history around
+        self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
+        self.state_history[self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
+        self.state_history[2*self.state_size:3*self.state_size] = state
 
         # === CLOCK ===
         clock = []
@@ -309,7 +322,7 @@ class SliderEnv(Env):
         vref.append(self.v_ref[0])
         vref.append(self.v_ref[1])
 
-        observation = np.array(np.concatenate((state, clock, vref)), dtype = np.float16)
+        observation = np.array(np.concatenate((self.state_history, clock, vref)), dtype = np.float16)
 
         return observation
 
