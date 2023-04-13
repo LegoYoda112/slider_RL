@@ -32,15 +32,15 @@
     </default>
 
     <default class = "slide_vel">
-      <velocity kv="100.0" group="1" gear = "1" forcerange = "-200 200"/>
+      <velocity kv="150.0" group="1" gear = "1" forcerange = "-200 200"/>
     </default>
 
     <default class = "foot_joint">
-        <position forcelimited="true" ctrllimited="true" kp="20.0" gear = "1" forcerange="-15 15"/>
+        <position forcelimited="true" ctrllimited="true" kp="60.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="1.0" group="1" gear ="1" forcerange = "-15 15"/>
+        <velocity forcelimited="true" kv="3.0" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 
