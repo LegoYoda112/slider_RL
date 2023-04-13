@@ -24,7 +24,19 @@ class SliderRLController(Node):
 
         self.get_logger().info("Starting RL controller")
 
-        self.observation = np.zeros(40)
+
+        self.qpos = np.zeros(17) # body quaternion, body position, joint position
+        self.qvel = np.zeros(16) # body angular vel, body vel, joint position
+        self.sin_clock = np.zeros(1)
+        self.vref = np.zeros(2)
+
+        self.state_history = np.zeros(3 * (len(self.qpos) + len(self.qvel)))
+
+        observation_length = (len(self.sin_clock) +
+                              len(self.vref) + 
+                              len(self.state_history))
+        
+        self.observation = np.zeros(observation_length)
 
         trial_name = ""
         model_save_path = "/home/thoma/Documents/ros2_ws/src/slider_RL/trained_models" + trial_name
@@ -132,14 +144,23 @@ class SliderRLController(Node):
         self.step_time = 0.7
         self.clock_value += self.dt  # highly incorrect oh my god
 
-        self.observation[34] = 10 * np.cos(1 * self.clock_value * 2 * np.pi / self.step_time)
-        self.observation[35] = 10 * np.sin(1 * self.clock_value * 2 * np.pi / self.step_time)
-        self.observation[36] = 10 * np.cos(1 * self.clock_value * 4 * np.pi / self.step_time)
-        self.observation[37] = 10 * np.sin(1 * self.clock_value * 4 * np.pi / self.step_time)
 
-        self.observation[38] = 0.0 # vref X
-        self.observation[39] = 0.0 # vref Y
+        # Make full state
+        self.state = np.concatenate((self.qpos[2:], self.qvel))
 
+        # Shuffle state history around
+        self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
+        self.state_history[self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
+        self.state_history[2*self.state_size:3*self.state_size] = self.state
+
+        # Make clock signal
+        self.sin_clock = np.array(10 * np.cos(1 * self.cycle_clock * 2 * np.pi / self.step_time))
+
+        # Set up target velocity
+        self.vref = np.array([0.0, 0.0])
+
+        # Build observation vector and append
+        self.observation = np.array(np.concatenate((self.state_history, self.sin_clock, self.vref)), dtype = np.float16)
         action = self.model.predict(self.observation, deterministic=True)[0]
 
         goal_msg = Float32MultiArray()
@@ -190,69 +211,38 @@ class SliderRLController(Node):
         # 8 "right_foot_roll"
         # 9 "right_foot_pitch"
         
-        self.observation[14] = msg.position[2] # Left slide length
-        self.observation[15] = msg.velocity[2] # Left slide velocity
-
-        self.observation[16] = msg.position[7] # Right slide length
-        self.observation[17] = msg.velocity[7] # Right slide velocity
-
-        self.observation[18] = msg.position[0] # Left roll length
-        self.observation[19] = msg.velocity[0] # Left roll velocity
-
-        self.observation[20] = msg.position[5] # Right roll length
-        self.observation[21] = msg.velocity[5] # Right roll velocity
-
-        self.observation[22] = msg.position[1] # Left pitch length
-        self.observation[23] = msg.velocity[1] # Left pitch velocity
-
-        self.observation[24] = msg.position[6] # Right pitch length
-        self.observation[25] = msg.velocity[6] # Right pitch velocity
-
-
-        self.observation[26] = -msg.position[4] # Left foot pitch length
-        self.observation[27] = -msg.velocity[4] # Left foot pitch velocity
-
-        self.observation[28] = msg.position[9] # Right foot pitch length
-        self.observation[29] = msg.velocity[9] # Right foot pitch velocity
-
-        self.observation[30] = msg.position[3] # Left foot roll length
-        self.observation[31] = msg.velocity[3] # Left foot roll velocity
-
-        self.observation[32] = msg.position[8] # Right foot roll length
-        self.observation[33] = msg.velocity[8] # Right foot roll velocity
+        self.qpos[7:17] = np.array(msg.position)
+        self.qvel[6:16] = np.array(msg.velocity)
 
         pass
 
     def imu_callback(self, msg):
 
-        # Set body linear acceleration
-        self.observation[4] = msg.linear_acceleration.y / 2.0
-        self.observation[5] = msg.linear_acceleration.x / 2.0
-        self.observation[6] = msg.linear_acceleration.z / 2.0
-
         # Set body angular velocity
-        self.observation[7] = msg.angular_velocity.x / 2.0
-        self.observation[8] = msg.angular_velocity.y / 2.0
-        self.observation[9] = msg.angular_velocity.z / 2.0
+        self.qvel[3] = msg.angular_velocity.x
+        self.qvel[4] = msg.angular_velocity.y
+        self.qvel[5] = msg.angular_velocity.z
 
         # Set body orientation
-        self.observation[10] = msg.orientation.w 
-        self.observation[11] = msg.orientation.x
-        self.observation[12] = msg.orientation.y
-        self.observation[13] = msg.orientation.z 
+        self.qpos[0] = msg.orientation.w 
+        self.qpos[1] = msg.orientation.x
+        self.qpos[2] = msg.orientation.y 
+        self.qpos[3] = msg.orientation.z
 
     def body_velocity_callback(self, msg):
         
-        self.observation[1] = msg.vector.x
-        self.observation[2] = msg.vector.y
-        self.observation[3] = msg.vector.z
+        self.qvel[0] = msg.vector.x
+        self.qvel[1] = msg.vector.y
+        self.qvel[2] = msg.vector.z
 
         pass
 
     def body_position_callback(self, msg):
         
         # Set body height
-        self.observation[0] = msg.pose.position.z * 0.0
+        self.qpos[0] = msg.pose.position.x
+        self.qpos[1] = msg.pose.position.y
+        self.qpos[2] = msg.pose.position.z
         pass
 
     def joy_callback(self, msg):
