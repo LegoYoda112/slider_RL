@@ -8,21 +8,22 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 env = SliderEnv()
 
-#  0.0003,
-
 model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
       tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
-# n_steps = int(8192 * 0.5),
+
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "new-feet-9"
+trial_name = "new_model_new_obs_forward-17-omni"
 model_save_path = "./trained_models/" + trial_name
 
-# trial_load_name = "candidate-forward-4-foot-obs"
-# model_save_path_load = "./trained_models/" + trial_load_name
+load = True
 
-# model =  PPO.load(model_save_path_load + "/model-20", env=env)
+if(load): 
+    trial_load_name = "new_model_new_obs_forward-16-omni"
+    model_save_path_load = "./trained_models/" + trial_load_name
+
+    model =  PPO.load(model_save_path_load + "/model-9", env=env, learning_rate = 0.00001)
 
 # Make save path
 try:
@@ -47,6 +48,9 @@ class TensorboardCallback(BaseCallback):
 
         # self.logger.record("reward", value)
         return True
+
+#Seed the enviroment
+env.seed(420)
 
 while True:
     total_timesteps += timesteps

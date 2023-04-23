@@ -4,21 +4,21 @@
   
   <!-- Default values -->
   <default>
-    <joint limited = "true" damping = "2.0" armature = "0"/>
+    <joint limited = "true" damping = "0.2" armature = "0"/>
     <position forcelimited = "true" forcerange = "-30 30" />
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
     <default class = "hip_roll_pos">
-      <position kp="100.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
+      <position kp="150.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
     </default>
 
     <default class = "hip_roll_vel">
       <!-- -144 144 -->
-      <velocity  kv="3.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
+      <velocity  kv="15.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
     </default>
 
     <default class = "hip_pitch_pos">
-      <position kp="100.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
+      <position kp="90.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
     </default>
 
     <default class = "hip_pitch_vel">
@@ -28,7 +28,7 @@
 
 
     <default class = "slide_joint">
-      <position ctrllimited="true" kp="1500.0" gear="1" forcerange = "-200 200"/>
+      <position ctrllimited="true" kp="4000.0" gear="1" forcerange = "-200 200"/>
     </default>
 
     <default class = "slide_vel">
@@ -36,11 +36,11 @@
     </default>
 
     <default class = "foot_joint">
-        <position forcelimited="true" ctrllimited="true" kp="20.0" gear = "1" forcerange="-15 15"/>
+        <position forcelimited="true" ctrllimited="true" kp="70.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="1.0" group="1" gear ="1" forcerange = "-15 15"/>
+        <velocity forcelimited="true" kv="5.0" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 
@@ -79,7 +79,9 @@
       <site name = "Torso-rangefinder4" zaxis = "0.6 0 -1"/>
       <site name = "Torso-rangefinder5" zaxis = "0.8 0 -1"/>
 
-      <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="3.8" diaginertia="0.00413343 0.00271163 0.00231369"/>
+      <inertial pos="-0.04 0.0 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="3.8" diaginertia="0.00413343 0.00271163 0.00231369"/>
+      
+      
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
         <inertial pos="-0.00651307 -0.000261818 7.57108e-06" quat="0.499137 0.498716 0.501955 0.500186" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
@@ -101,8 +103,13 @@
                 <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <!-- <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/> -->
-                <geom name = "Right_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
-                 <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
+                <!-- <geom name = "Right_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/> -->
+                <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.2"/>
+
+                <geom size="0.001" pos="0.1 0.04 -0.044"/>
+                <geom size="0.001" pos="0.1 -0.04 -0.044"/>
+                <geom size="0.001" pos="-0.1 -0.04 -0.044"/>
+                <geom size="0.001" pos="-0.1 0.04 -0.044"/>
 
               </body> 
             </body>
@@ -129,13 +136,13 @@
                 <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <!-- <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot" conaffinity = "0" contype = "0"/> -->
-                <geom name = "Left_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
-                <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
+                <!-- <geom name = "Left_Foot_Contact" type = "box" size = "0.1 0.04 0.013" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/> -->
+                <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.2"/>
 
-                <!-- <geom size="0.01" pos="0.08181 0.04715 -0.0325"/>
-                <geom size="0.01" pos="0.08181 -0.04715 -0.0325" rgba="0 0 0.8 1"/>
-                <geom size="0.01" pos="-0.08181 -0.04715 -0.0325"/>
-                <geom size="0.01" pos="-0.08181 0.04715 -0.0325"/> -->
+                <geom size="0.001" pos="0.1 0.04 -0.044"/>
+                <geom size="0.001" pos="0.1 -0.04 -0.044"/>
+                <geom size="0.001" pos="-0.1 -0.04 -0.044"/>
+                <geom size="0.001" pos="-0.1 0.04 -0.044"/>
               </body>
             </body>
           </body>
@@ -204,8 +211,8 @@
         <gyro name = "body-gyro" site = "Torso"/>
         <accelerometer name = "body-accel" site = "Torso"/>
 
-        <touch name = "left-foot-touch" site = "Left-Foot"/>
         <touch name = "right-foot-touch" site = "Right-Foot"/>
+        <touch name = "left-foot-touch" site = "Left-Foot"/>
 
         <!-- <rangefinder name = "dist1" site="Torso-rangefinder1" cutoff = "5"/>
         <rangefinder name = "dist2" site="Torso-rangefinder2" cutoff = "5"/>
