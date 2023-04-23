@@ -3,13 +3,14 @@
     <compiler texturedir="../meshes/"  
         meshdir="../meshes/" balanceinertia="true"/>
 
-    <statistic extent="1.5" meansize="0.1"/>
+    <!-- <statistic extent="1.5" meansize="0.1"/> -->
 
     <option jacobian="auto">
         <flag multiccd="enable"/>
     </option>
 
-    <option viscosity="0.0"/>
+    <option viscosity="0.1"/>
+    <option noslip_iterations="2"/>
 
     <!-- Rendering properties -->
     <visual>

@@ -28,19 +28,19 @@
 
 
     <default class = "slide_joint">
-      <position ctrllimited="true" kp="1500.0" gear="1" forcerange = "-200 200"/>
+      <position ctrllimited="true" kp="2000.0" gear="1" forcerange = "-400 400"/>
     </default>
 
     <default class = "slide_vel">
-      <velocity kv="200.0" group="1" gear = "1" forcerange = "-200 200"/>
+      <velocity kv="50.0" group="1" gear = "1" forcerange = "-400 400"/>
     </default>
-
+ 
     <default class = "foot_joint">
         <position forcelimited="true" ctrllimited="true" kp="60.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="6.0" group="1" gear ="1" forcerange = "-15 15"/>
+        <velocity forcelimited="true" kv="5.0" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 

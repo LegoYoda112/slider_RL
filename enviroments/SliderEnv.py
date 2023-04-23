@@ -90,8 +90,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        # self.v_ref = (np.random.uniform(0.5, 0.0), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
-        self.v_ref = (0.5, 0.0, 0.0)
+        self.v_ref = (np.random.uniform(0.5, -0.2), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
+        # self.v_ref = (0.5, 0.0, 0.0)
 
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
@@ -296,15 +296,18 @@ class SliderEnv(Env):
         qpos = self.data.qpos
         qvel = self.data.qvel
 
-        pos_noise_scale = np.random.normal(size=(15)) * 0.1
-        vel_noise_scale = np.random.normal(size=(16)) * 0.1
+        pos_noise_scale = np.random.normal(size=(15)) * 0.01
+        vel_noise_scale = np.random.normal(size=(16)) * 0.01
 
         # === Full state === (minus x and y position)
         state = np.concatenate((qpos[2:] + pos_noise_scale, qvel + vel_noise_scale))
 
+        #print(state)
+        #print()
+
         # Shuffle state history around
         self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
-        self.state_history[self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
+        self.state_history[1*self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
         self.state_history[2*self.state_size:3*self.state_size] = state
 
         # === CLOCK ===
@@ -335,7 +338,7 @@ class SliderEnv(Env):
         space = 32
 
         if(key == up):
-            self.v_ref = (0.5, 0.0, 0.0)
+            self.v_ref = (0.3, 0.0, 0.0)
             pass
 
         if(key == down):
