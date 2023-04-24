@@ -9,7 +9,7 @@
         <flag multiccd="enable"/>
     </option>
 
-    <option viscosity="0.0"/>
+    <option noslip_iterations="5"/>
 
     <!-- Rendering properties -->
     <visual>

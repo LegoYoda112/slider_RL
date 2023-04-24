@@ -15,7 +15,7 @@ class SliderEnv(Env):
         self.max_ep_time = 20 # Seconds
 
         # Gait params
-        self.step_time = 0.7 # s - time per step
+        self.step_time = 0.8 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -90,8 +90,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        self.v_ref = (np.random.uniform(0.5, -0.2), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
-        # self.v_ref = (0.5, 0.0, 0.0)
+        # self.v_ref = (np.random.uniform(0.5, -0.2), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
+        self.v_ref = (0.5, 0.0, 0.0)
 
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
@@ -185,7 +185,7 @@ class SliderEnv(Env):
         self.data.ctrl[2] = action[1] * 0.8
         
         # Slide
-        self.data.ctrl[4] = action[2] * 0.1 + 0.1
+        self.data.ctrl[4] = action[2] * 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[6] = action[3] * 0.5
@@ -197,7 +197,7 @@ class SliderEnv(Env):
         self.data.ctrl[12] = action[6] * 0.8
         
         # Slide
-        self.data.ctrl[14] = action[7] * 0.1 + 0.1
+        self.data.ctrl[14] = action[7] * 0.1
 
         # Foot Roll Pitch
         self.data.ctrl[16] = action[8] * 0.5
@@ -262,7 +262,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["effort"]
 
         # Body velocity cost
-        self.cost_dict["body_vel"] = 3.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 3.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
+        self.cost_dict["body_vel"] = 5.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 5.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
         cost += self.cost_dict["body_vel"]
 
         # Orientation reward
@@ -287,7 +287,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (0.5 - cost)
+        reward = (1.0 - cost)
 
         # Return reward
         return reward
