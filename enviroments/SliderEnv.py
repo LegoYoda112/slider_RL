@@ -258,7 +258,7 @@ class SliderEnv(Env):
         actuator_effort += self.actuator_power("Left_Foot_Pitch") ** 2 * ankle_factor
         actuator_effort += self.actuator_power("Right_Foot_Pitch") ** 2 * ankle_factor
         
-        self.cost_dict["effort"] = actuator_effort / 100000.0
+        self.cost_dict["effort"] = actuator_effort / 500000.0
         cost += self.cost_dict["effort"]
 
         # Body velocity cost
@@ -287,7 +287,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (1.0 - cost)
+        reward = (1.5 - cost)
 
         # Return reward
         return reward
@@ -306,9 +306,9 @@ class SliderEnv(Env):
         #print()
 
         # Shuffle state history around
-        self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
-        self.state_history[1*self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
-        self.state_history[2*self.state_size:3*self.state_size] = state
+        # self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
+        # self.state_history[1*self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
+        # self.state_history[2*self.state_size:3*self.state_size] = state
 
         # === CLOCK ===
         clock = []
@@ -325,7 +325,7 @@ class SliderEnv(Env):
         vref.append(self.v_ref[0])
         vref.append(self.v_ref[1])
 
-        observation = np.array(np.concatenate((self.state_history, clock, vref)), dtype = np.float16)
+        observation = np.array(np.concatenate((state, clock, vref)), dtype = np.float16)
 
         return observation
 
