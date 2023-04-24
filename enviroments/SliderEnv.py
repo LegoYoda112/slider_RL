@@ -15,7 +15,7 @@ class SliderEnv(Env):
         self.max_ep_time = 20 # Seconds
 
         # Gait params
-        self.step_time = 0.7 # s - time per step
+        self.step_time = 1.0 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -23,8 +23,8 @@ class SliderEnv(Env):
 
         self.cost_dict = {}
 
-        self.action_noise_scale = 0.01
-        self.action_offset_noise_scale = 0.01
+        self.action_noise_scale = 0.00
+        self.action_offset_noise_scale = 0.00
 
         self.purtrub_max = [100,100,100] # Newtons
         self.purtrub_prob = 0.001 # Probability per timestep
@@ -34,7 +34,7 @@ class SliderEnv(Env):
 
         # ======= STATE HISTORY =====
         self.state_size = 31
-        self.state_history_length = 3 # states 
+        self.state_history_length = 1 # states 
         self.state_history = np.zeros(self.state_size * self.state_history_length)
 
         # ======= MUJOCO INIT =======
@@ -56,7 +56,7 @@ class SliderEnv(Env):
         mj.mjv_defaultOption(self.opt)
 
         # Load a Mujoco model from the xml path
-        xml_path = "enviroments/models/flat_world_2022_feet.xml"
+        xml_path = "enviroments/models/flat_world_new_feet.xml"
         # xml_path2 = "enviroments/models/flat_world_new_feet.xml"
         self.model = mj.MjModel.from_xml_path(xml_path)
         self.data = mj.MjData(self.model)
@@ -79,7 +79,6 @@ class SliderEnv(Env):
         # Action space
         # 0-4 leg 0 positions
         # 5-9 leg 1 positions
-        # 10-14 leg position gains
         num_actions = 10
         self.action_space = spaces.Box(low = -np.ones(num_actions) * 1, high= np.ones(num_actions) * 1, dtype = np.float32)
 
@@ -90,14 +89,14 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        self.v_ref = (np.random.uniform(0.5, -0.2), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
-        # self.v_ref = (0.5, 0.0, 0.0)
+        # self.v_ref = (np.random.uniform(0.5, -0.2), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
+        self.v_ref = (0.5, 0.0, 0.0)
 
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
         # Randomize starting position and velocity
-        # self.data.qpos[0] = np.random.uniform(-1, 1)
-        self.data.qpos[0] = -0.5
+        self.data.qpos[0] = np.random.uniform(-1.5, 0.0)
+        # self.data.qpos[0] = -0.5
         self.data.qvel[0] = np.random.uniform(0.2, 0.2)
 
         self.data.qpos[1] = np.random.uniform(-0.2, 0.2)
@@ -161,7 +160,7 @@ class SliderEnv(Env):
         
         # If we've fallen over, stop the episode6
         if(self.data.body("base_link").xpos[2] < 0.4):
-            reward -= 200.0
+            reward -= 100.0
             done = True
         
         # if(np.random.random() < self.v_ref_change_prob):
@@ -179,28 +178,28 @@ class SliderEnv(Env):
         # Apply noise and constant offsets to actions
         action += (np.random.normal(size=(len(action))) * self.action_noise_scale + self.action_offset_noise) * action_noise_flag
 
-        # ====== Left foot
+        # ====== Left
         # Roll Pitch
         self.data.ctrl[0] = action[0] * 0.3
         self.data.ctrl[2] = action[1] * 0.8
         
         # Slide
-        self.data.ctrl[4] = action[2] * 0.1 + 0.1
+        self.data.ctrl[4] = action[2] * 0.1
 
         # Foot Roll Pitch
-        self.data.ctrl[6] = action[3] * 0.5
+        self.data.ctrl[6] = action[3] * 0.0
         self.data.ctrl[8] = action[4] * 0.5
 
-        # ====== Right foot
+        # ====== Right
         # Roll Pitch
         self.data.ctrl[10] = action[5] * 0.3
         self.data.ctrl[12] = action[6] * 0.8
         
         # Slide
-        self.data.ctrl[14] = action[7] * 0.1 + 0.1
+        self.data.ctrl[14] = action[7] * 0.1
 
         # Foot Roll Pitch
-        self.data.ctrl[16] = action[8] * 0.5
+        self.data.ctrl[16] = action[8] * 0.0
         self.data.ctrl[18] = action[9] * 0.5
 
         # Apply a purturbation
@@ -234,35 +233,56 @@ class SliderEnv(Env):
         lf_drag_cost = np.linalg.norm([lf_vel[0], lf_vel[1]]) * left_force[0] 
         rf_drag_cost = np.linalg.norm([rf_vel[0], rf_vel[1]]) * right_force[0]
 
-        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.015
+        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.01
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 1.0
+        slide_factor = 5.0
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
-        ankle_factor = 2.0
+        ankle_factor = 1.0
 
         actuator_effort = self.actuator_power("Left_Slide") ** 2 * slide_factor
         actuator_effort += self.actuator_power("Right_Slide") ** 2 * slide_factor
 
+        # print("Slide", actuator_effort)
+
         actuator_effort += self.actuator_power("Left_Roll") ** 2 * roll_factor
         actuator_effort += self.actuator_power("Right_Roll") ** 2 * roll_factor
 
+        # print("Roll", actuator_effort)
+
         actuator_effort += self.actuator_power("Left_Pitch") ** 2 
         actuator_effort += self.actuator_power("Right_Pitch") ** 2 
+
+        # print("Pitch", actuator_effort)
 
         actuator_effort += self.actuator_power("Left_Foot_Roll") ** 2 * ankle_factor
         actuator_effort += self.actuator_power("Right_Foot_Roll") ** 2 * ankle_factor
         actuator_effort += self.actuator_power("Left_Foot_Pitch") ** 2 * ankle_factor
         actuator_effort += self.actuator_power("Right_Foot_Pitch") ** 2 * ankle_factor
+
+        # print("Foot", actuator_effort)
         
-        self.cost_dict["effort"] = actuator_effort / 100000.0
+        self.cost_dict["effort"] = actuator_effort / 2000000.0
         cost += self.cost_dict["effort"]
+        
+        vel_factor = 0.005
+
+        # Slide velocity 
+        # self.cost_dict["slide_vel"] = abs(self.data.actuator("Left_Slide").velocity[0] * vel_factor)
+        # self.cost_dict["slide_vel"] += abs(self.data.actuator("Right_Slide").velocity[0] * vel_factor)
+
+        # if((left_force + right_force) < 1.0):
+        #     self.cost_dict["jump"] = 0.5
+        # else:
+        #     self.cost_dict["jump"] = 0.0
+
+        # cost += self.cost_dict["jump"]
 
         # Body velocity cost
-        self.cost_dict["body_vel"] = 3.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 3.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
+        self.cost_dict["body_vel"] = 2.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 1.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
         cost += self.cost_dict["body_vel"]
 
         # Orientation reward
@@ -278,16 +298,16 @@ class SliderEnv(Env):
         mj.mju_rotVecQuat(forward_rel, forward, quat)
 
         self.cost_dict["body_orientation"] = 0.5 * np.linalg.norm([up_rel[0], up_rel[1]])
-        self.cost_dict["body_orientation"] = 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]])
+        self.cost_dict["body_orientation"] += 0.5 * np.linalg.norm([forward_rel[1], forward_rel[2]])
         cost += self.cost_dict["body_orientation"]
         
         # Body movement cost
-        self.cost_dict["body_movement"] = 0.02 * np.linalg.norm(self.data.sensor("body-gyro").data)
-        self.cost_dict["body_movement"] += 0.01 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
+        self.cost_dict["body_movement"] = 0.05 * np.linalg.norm(self.data.sensor("body-gyro").data)
+        self.cost_dict["body_movement"] += 0.05 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (0.5 - cost)
+        reward = (0.6 - cost)
 
         # Return reward
         return reward
@@ -306,9 +326,9 @@ class SliderEnv(Env):
         #print()
 
         # Shuffle state history around
-        self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
-        self.state_history[1*self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
-        self.state_history[2*self.state_size:3*self.state_size] = state
+        # self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
+        # self.state_history[1*self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
+        # self.state_history[2*self.state_size:3*self.state_size] = state
 
         # === CLOCK ===
         clock = []
@@ -325,7 +345,7 @@ class SliderEnv(Env):
         vref.append(self.v_ref[0])
         vref.append(self.v_ref[1])
 
-        observation = np.array(np.concatenate((self.state_history, clock, vref)), dtype = np.float16)
+        observation = np.array(np.concatenate((state, clock, vref)), dtype = np.float16)
 
         return observation
 

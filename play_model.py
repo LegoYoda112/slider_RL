@@ -14,11 +14,11 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "new_model_new_obs_forward-17-omni"
+trial_name = "new-feet-new-sim-33"
 model_save_path = "./trained_models/" + trial_name
 
 
-model =  PPO.load(model_save_path + "/model-39", env=env)
+model =  PPO.load(model_save_path + "/model-19", env=env)
 
 forward = False
 
@@ -36,12 +36,12 @@ while True:
 
     # Render things
     for i in range(10000):
-        i+=1
+        # i+=1
 
         action, _state = model.predict(obs, deterministic=True)
 
-        print(action)
-        print()
+        #print(action)
+        #print()
 
         # i = 0
         # for value in obs:
@@ -119,7 +119,7 @@ while True:
         # if(done):
         #     env.reset()
 
-        time.sleep(0.01)
+        time.sleep(0.011)
         # input()
         # time.sleep(0.1)
 

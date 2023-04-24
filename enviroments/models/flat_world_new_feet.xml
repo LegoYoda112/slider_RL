@@ -9,7 +9,7 @@
         <flag multiccd="enable"/>
     </option>
 
-    <option viscosity="0.1"/>
+    <option viscosity="0.0"/>
     <option noslip_iterations="2"/>
 
     <!-- Rendering properties -->
@@ -52,9 +52,9 @@
 
         <!-- <geom type = "box" size = "0.2 0.2 1" pos = "1.2 1.1 -0.87" />
         <geom type = "box" size = "0.2 0.2 1" pos = "0.1 0.5 -0.87" />
-        <geom type = "box" size = "0.2 0.2 1" pos = "0.6 0.1 -0.87" />
+        <geom type = "box" size = "0.2 0.2 1" pos = "0.6 0.1 -0.86" />
         <geom type = "box" size = "0.2 0.2 1" pos = "2 2.1 -0.87" />
-        <geom type = "box" size = "0.2 0.2 1" pos = "0.2 0 -0.87" /> -->
+        <geom type = "box" size = "0.2 0.2 1" pos = "0.2 0 -0.89" /> -->
 
         <!-- <geom name="obstical4" type = "box" size = "1 5 1" pos = "-0.0 0 -0.88" />
         <geom name="obstical5" type = "box" size = "0.73 5 1" pos = "-0.0 0 -0.86"/>
