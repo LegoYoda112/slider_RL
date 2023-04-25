@@ -36,11 +36,11 @@
     </default>
  
     <default class = "foot_joint">
-        <position forcelimited="true" ctrllimited="true" kp="90.0" gear = "1" forcerange="-10 10"/>
+        <position forcelimited="true" ctrllimited="true" kp="70.0" gear = "1" forcerange="-10 10"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="7.0" group="1" gear ="1" forcerange = "-10 10"/>
+        <velocity forcelimited="true" kv="5.0" group="1" gear ="1" forcerange = "-10 10"/>
     </default>
   </default>
 
@@ -106,10 +106,10 @@
                  <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
 
 
-                <!-- <geom size="0.01" pos="0.1 0.07 -0.044"/>
+                <geom size="0.01" pos="0.1 0.07 -0.044"/>
                 <geom size="0.01" pos="0.1 -0.07 -0.044"/>
                 <geom size="0.01" pos="-0.1 -0.07 -0.044"/>
-                <geom size="0.01" pos="-0.1 0.07 -0.044"/> -->
+                <geom size="0.01" pos="-0.1 0.07 -0.044"/>
 
               </body> 
             </body>
@@ -139,10 +139,10 @@
                 <geom name = "Left_Foot_Contact" type = "box" size = "0.115 0.085 0.018" mass = "0" pos = "0 0 -0.031" rgba = "0.5 0.5 0.5 0.0"/>
                 <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
 
-                <!-- <geom size="0.01" pos="0.1 0.07 -0.044"/>
+                <geom size="0.01" pos="0.1 0.07 -0.044"/>
                 <geom size="0.01" pos="0.1 -0.07 -0.044"/>
                 <geom size="0.01" pos="-0.1 -0.07 -0.044"/>
-                <geom size="0.01" pos="-0.1 0.07 -0.044"/> -->
+                <geom size="0.01" pos="-0.1 0.07 -0.044"/>
               </body>
             </body>
           </body>

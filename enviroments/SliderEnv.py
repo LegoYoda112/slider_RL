@@ -15,7 +15,7 @@ class SliderEnv(Env):
         self.max_ep_time = 20 # Seconds
 
         # Gait params
-        self.step_time = 0.8 # s - time per step
+        self.step_time = 0.6 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -234,7 +234,34 @@ class SliderEnv(Env):
         lf_drag_cost = np.linalg.norm([lf_vel[0], lf_vel[1]]) * left_force[0] 
         rf_drag_cost = np.linalg.norm([rf_vel[0], rf_vel[1]]) * right_force[0]
 
-        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.015
+        self.cost_dict['foot_vel'] = (lf_drag_cost + rf_drag_cost) * 0.01
+
+        cc = self.cycle_clock
+
+        ground_factor = 5.0
+
+        lf_vel = self.data.sensor("left-foot-vel").data
+        rf_vel = self.data.sensor("right-foot-vel").data
+
+        self.cost_dict['foot_vel'] = 0
+        # == Left Leg
+        if(cc > self.stance_time):
+            # STANCE
+            self.cost_dict['foot_vel'] += ground_factor * np.linalg.norm(lf_vel)
+            pass
+        else:
+            # SWING
+            pass
+        
+        # == Right foot
+        if(cc < self.stance_time):
+            # STANCE
+            self.cost_dict['foot_vel'] += ground_factor * np.linalg.norm(rf_vel)
+            pass
+        else:
+            # SWING
+            pass
+
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
@@ -242,7 +269,7 @@ class SliderEnv(Env):
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
-        ankle_factor = 2.0
+        ankle_factor = 1.0
 
         actuator_effort = self.actuator_power("Left_Slide") ** 2 * slide_factor
         actuator_effort += self.actuator_power("Right_Slide") ** 2 * slide_factor
@@ -250,8 +277,8 @@ class SliderEnv(Env):
         actuator_effort += self.actuator_power("Left_Roll") ** 2 * roll_factor
         actuator_effort += self.actuator_power("Right_Roll") ** 2 * roll_factor
 
-        actuator_effort += self.actuator_power("Left_Pitch") ** 2 
-        actuator_effort += self.actuator_power("Right_Pitch") ** 2 
+        actuator_effort += self.actuator_power("Left_Pitch") ** 2 * 1.0
+        actuator_effort += self.actuator_power("Right_Pitch") ** 2 * 1.0
 
         actuator_effort += self.actuator_power("Left_Foot_Roll") ** 2 * ankle_factor
         actuator_effort += self.actuator_power("Right_Foot_Roll") ** 2 * ankle_factor
@@ -262,7 +289,10 @@ class SliderEnv(Env):
         cost += self.cost_dict["effort"]
 
         # Body velocity cost
-        self.cost_dict["body_vel"] = 5.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 5.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
+        self.cost_dict["body_vel"] = 5.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 3.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
+
+        if(self.cost_dict["body_vel"] < 0.1):
+            self.cost_dict["body_vel"] = 0.0
         cost += self.cost_dict["body_vel"]
 
         # Orientation reward
@@ -277,8 +307,8 @@ class SliderEnv(Env):
         forward_rel = np.zeros(3)
         mj.mju_rotVecQuat(forward_rel, forward, quat)
 
-        self.cost_dict["body_orientation"] = 0.5 * np.linalg.norm([up_rel[0], up_rel[1]])
-        self.cost_dict["body_orientation"] = 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]])
+        self.cost_dict["body_orientation"] = 1.0 * np.linalg.norm([up_rel[0], up_rel[1]])
+        self.cost_dict["body_orientation"] += 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]])
         cost += self.cost_dict["body_orientation"]
         
         # Body movement cost
@@ -306,9 +336,9 @@ class SliderEnv(Env):
         #print()
 
         # Shuffle state history around
-        # self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
-        # self.state_history[1*self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
-        # self.state_history[2*self.state_size:3*self.state_size] = state
+        self.state_history[0:self.state_size] = self.state_history[self.state_size:2*self.state_size]
+        self.state_history[1*self.state_size:2*self.state_size] = self.state_history[2*self.state_size:3*self.state_size]
+        self.state_history[2*self.state_size:3*self.state_size] = state
 
         # === CLOCK ===
         clock = []
@@ -325,7 +355,7 @@ class SliderEnv(Env):
         vref.append(self.v_ref[0])
         vref.append(self.v_ref[1])
 
-        observation = np.array(np.concatenate((state, clock, vref)), dtype = np.float16)
+        observation = np.array(np.concatenate((self.state_history, clock, vref)), dtype = np.float16)
 
         return observation
 
