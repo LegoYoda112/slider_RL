@@ -16,16 +16,16 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003,
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "new_model_new_obs_forward-42-omni"
+trial_name = "new_model_new_obs_forward-56-omni"
 model_save_path = "./trained_models/" + trial_name
 
-load = False
+load = True
 
 if(load): 
-    trial_load_name = "new_model_new_obs_forward-32-omni"
+    trial_load_name = "new_model_new_obs_forward-52-omni"
     model_save_path_load = "./trained_models/" + trial_load_name
 
-    model =  PPO.load(model_save_path_load + "/model-12", env=env, learning_rate = 0.0005)
+    model =  PPO.load(model_save_path_load + "/model-8", env=env, learning_rate = 0.0001)
 
 # Make save path
 try:

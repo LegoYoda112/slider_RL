@@ -15,7 +15,7 @@ class SliderEnv(Env):
         self.max_ep_time = 20 # Seconds
 
         # Gait params
-        self.step_time = 0.6 # s - time per step
+        self.step_time = 0.7 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -27,7 +27,7 @@ class SliderEnv(Env):
         self.action_offset_noise_scale = 0.01
 
         self.purtrub_max = [100,100,100] # Newtons
-        self.purtrub_prob = 0.001 # Probability per timestep
+        self.purtrub_prob = 0.000 # Probability per timestep
 
         self.v_ref_change_prob = 0.001
         self.v_ref = [0,0,0]
@@ -90,8 +90,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        # self.v_ref = (np.random.uniform(0.5, -0.2), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
-        self.v_ref = (0.5, 0.0, 0.0)
+        self.v_ref = (np.random.uniform(0.5, -0.2), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
+        # self.v_ref = (0.5, 0.0, 0.0)
 
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
@@ -265,11 +265,11 @@ class SliderEnv(Env):
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 1.0
+        slide_factor = 10.0
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
-        ankle_factor = 1.0
+        ankle_factor = 10.0
 
         actuator_effort = self.actuator_power("Left_Slide") ** 2 * slide_factor
         actuator_effort += self.actuator_power("Right_Slide") ** 2 * slide_factor
@@ -285,13 +285,13 @@ class SliderEnv(Env):
         actuator_effort += self.actuator_power("Left_Foot_Pitch") ** 2 * ankle_factor
         actuator_effort += self.actuator_power("Right_Foot_Pitch") ** 2 * ankle_factor
         
-        self.cost_dict["effort"] = actuator_effort / 500000.0
+        self.cost_dict["effort"] = actuator_effort / 100000.0
         cost += self.cost_dict["effort"]
 
         # Body velocity cost
         self.cost_dict["body_vel"] = 5.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 3.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
 
-        if(self.cost_dict["body_vel"] < 0.1):
+        if(self.cost_dict["body_vel"] < 0.05):
             self.cost_dict["body_vel"] = 0.0
         cost += self.cost_dict["body_vel"]
 
@@ -317,7 +317,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["body_movement"]
 
         # Add a constant offset to prevent early termination
-        reward = (1.5 - cost)
+        reward = (3.0 - cost)
 
         # Return reward
         return reward
@@ -372,7 +372,7 @@ class SliderEnv(Env):
             pass
 
         if(key == down):
-            self.v_ref = (-0.5, 0.0, 0.0)
+            self.v_ref = (-0.2, 0.0, 0.0)
             pass
 
         if(key == left):

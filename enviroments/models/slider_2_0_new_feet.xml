@@ -4,39 +4,39 @@
   
   <!-- Default values -->
   <default>
-    <joint limited = "true" damping = "0.2" armature = "0"/>
+    <joint limited = "true" damping = "0.0" armature = "0"/>
     <position forcelimited = "true" forcerange = "-30 30" />
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
     <default class = "hip_roll_pos">
-      <position kp="150.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
+      <position kp="200.0" ctrllimited="true" forcelimited = "true" forcerange = "-144 144" ctrlrange="-0.3 0.3"/>
     </default>
 
     <default class = "hip_roll_vel">
       <!-- -144 144 -->
-      <velocity  kv="15.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
+      <velocity  kv="18.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
     </default>
 
     <default class = "hip_pitch_pos">
-      <position kp="90.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
+      <position kp="100.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
     </default>
 
     <default class = "hip_pitch_vel">
       <!-- -65 65 -->
-      <velocity  kv="3.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+      <velocity  kv="8.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
     </default>
 
 
     <default class = "slide_joint">
-      <position ctrllimited="true" kp="4000.0" gear="1" forcerange = "-200 200"/>
+      <position ctrllimited="true" kp="2000.0" gear="1" forcerange = "-200 200"/>
     </default>
 
     <default class = "slide_vel">
-      <velocity kv="100.0" group="1" gear = "1" forcerange = "-200 200"/>
+      <velocity kv="150.0" group="1" gear = "1" forcerange = "-100 100"/>
     </default>
 
     <default class = "foot_joint">
-        <position forcelimited="true" ctrllimited="true" kp="70.0" gear = "1" forcerange="-15 15"/>
+        <position forcelimited="true" ctrllimited="true" kp="60.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
@@ -84,7 +84,7 @@
       
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
-        <inertial pos="-0.00651307 -0.000261818 7.57108e-06" quat="0.499137 0.498716 0.501955 0.500186" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
+        <inertial pos="-0.1 -0.000261818 7.57108e-06" quat="0.499137 0.498716 0.501955 0.500186" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
         <joint name="Right_Roll" pos="0 0 0" axis="-1 0 0" range="-1.57 0.35"/>
         <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Pitch_Casing"/>
         <body name="Right_Slide_Casing" pos="0 -0.1042 0">
@@ -100,11 +100,11 @@
               <joint name="Right_Foot_Pitch" pos="0 0 0" axis="0 1 0" range="-0.52 0.52"/>
               <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot_Pitch_Link"/>
               <body name="Right_Foot" pos="0 0 0">
-                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
+                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.2" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <!-- <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/> -->
-                <!-- <geom name = "Right_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/> -->
-                <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.2"/>
+                <geom name = "Right_Foot_Contact" type = "box" size = "0.1 0.04 0.01" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
+                <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
 
                 <geom size="0.001" pos="0.1 0.04 -0.044"/>
                 <geom size="0.001" pos="0.1 -0.04 -0.044"/>
@@ -117,7 +117,7 @@
         </body>
       </body>
       <body name="Left_Pitch_Casing" pos="0 0.075 0">
-        <inertial pos="-0.00651307 0.000261818 -7.57108e-06" quat="0.501955 0.500186 0.499137 0.498716" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
+        <inertial pos="-0.1 0.000261818 -7.57108e-06" quat="0.501955 0.500186 0.499137 0.498716" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
         <joint name="Left_Roll" pos="0 0 0" axis="-1 0 0" range="-0.35 1.57"/>
         <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Pitch_Casing"/>
         <body name="Left_Slide_Casing" pos="0 0.1042 0">
@@ -133,11 +133,11 @@
               <joint name="Left_Foot_Pitch" pos="0 0 0" axis="0 -1 0" range="-0.52 0.52"/>
               <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot_Pitch_Link"/>
               <body name="Left_Foot" pos="0 0 0">
-                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
+                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.2" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <!-- <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot" conaffinity = "0" contype = "0"/> -->
-                <!-- <geom name = "Left_Foot_Contact" type = "box" size = "0.1 0.04 0.013" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/> -->
-                <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.2"/>
+                <geom name = "Left_Foot_Contact" type = "box" size = "0.1 0.04 0.013" mass = "0" pos = "0.0 0 -0.027" rgba = "0.5 0.5 0.5 1.0"/>
+                <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
 
                 <geom size="0.001" pos="0.1 0.04 -0.044"/>
                 <geom size="0.001" pos="0.1 -0.04 -0.044"/>
