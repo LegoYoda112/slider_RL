@@ -8,12 +8,12 @@ from stable_baselines3 import PPO
 
 
 
-trial_name = "model_v4-3"
+trial_name = "model_v7-2"
 model_save_path = "./trained_models/" + trial_name
 
 env = SliderEnv(trial_name)
 
-model =  PPO.load(model_save_path + "/model-92", env=env)
+model =  PPO.load(model_save_path + "/model-8", env=env)
 
 forward = False
 

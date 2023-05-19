@@ -11,25 +11,25 @@ from stable_baselines3.common.callbacks import BaseCallback
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "model_v6-1"
+trial_name = "model_v7-9-fromscratch"
 model_save_path = "./trained_models/" + trial_name
 
 
 
 env = SliderEnv(trial_name)
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.00001, 
-      tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
+      tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 1))
 
 # n_steps = int(8192 * 0.5)
 
-load = True
+load = False
 
 if(load): 
-    trial_load_name = "model_v5-6"
+    trial_load_name = "model_v7-2"
     model_save_path_load = "./trained_models/" + trial_load_name
 
-    model =  PPO.load(model_save_path_load + "/model-27", env=env, learning_rate = 0.00001)
+    model =  PPO.load(model_save_path_load + "/model-17", env=env, learning_rate = 0.001)
 
 # Make save path
 try:
