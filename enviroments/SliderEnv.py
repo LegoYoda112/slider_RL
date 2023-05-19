@@ -164,7 +164,7 @@ class SliderEnv(Env):
         
         # If we've fallen over, stop the episode6
         if(self.data.body("base_link").xpos[2] < 0.4):
-            reward -= 2.0
+            reward -= 0.0
             done = True
         
         # if(np.random.random() < self.v_ref_change_prob):
@@ -189,26 +189,26 @@ class SliderEnv(Env):
         # ====== Left foot
         # Roll Pitch
         self.data.ctrl[0] = action[0] * 0.3 * scale
-        self.data.ctrl[2] = action[1] * 0.8 * scale
+        self.data.ctrl[2] = action[1] * 0.4 * scale
         
         # Slide
-        self.data.ctrl[4] = action[2] * 0.1 * scale
+        self.data.ctrl[4] = action[2] * 0.05 * scale
 
         # Foot Roll Pitch
-        self.data.ctrl[6] = action[3] * 0.5 * scale
-        self.data.ctrl[8] = action[4] * 0.5 * scale
+        self.data.ctrl[6] = action[3] * 0.3 * scale
+        self.data.ctrl[8] = action[4] * 0.3 * scale
 
         # ====== Right foot
         # Roll Pitch
         self.data.ctrl[10] = action[5] * 0.3 * scale
-        self.data.ctrl[12] = action[6] * 0.8 * scale
+        self.data.ctrl[12] = action[6] * 0.4 * scale
         
         # Slide
-        self.data.ctrl[14] = action[7] * 0.1 * scale
+        self.data.ctrl[14] = action[7] * 0.05 * scale
 
         # Foot Roll Pitch
-        self.data.ctrl[16] = action[8] * 0.5 * scale
-        self.data.ctrl[18] = action[9] * 0.5 * scale
+        self.data.ctrl[16] = action[8] * 0.3 * scale
+        self.data.ctrl[18] = action[9] * 0.3 * scale
 
         # Apply a purturbation
         if(np.random.rand() < self.purtrub_prob):
@@ -254,7 +254,7 @@ class SliderEnv(Env):
 
         cc = self.cycle_clock
 
-        ground_factor = 5.0
+        ground_factor = 10.0
 
         lf_vel = self.data.sensor("left-foot-vel").data
         rf_vel = self.data.sensor("right-foot-vel").data
@@ -281,11 +281,11 @@ class SliderEnv(Env):
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 2.0
+        slide_factor = 1.0
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
-        ankle_factor = 1.0
+        ankle_factor = 10.0
 
         actuator_effort = self.actuator_power("Left_Slide") ** 2 * slide_factor
         actuator_effort += self.actuator_power("Right_Slide") ** 2 * slide_factor
@@ -342,13 +342,13 @@ class SliderEnv(Env):
         forward_rel = np.zeros(3)
         mj.mju_rotVecQuat(forward_rel, forward, quat)
 
-        self.cost_dict["body_orientation"] = 0.8 * np.linalg.norm([up_rel[0], up_rel[1]])
-        self.cost_dict["body_orientation"] += 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]])
+        self.cost_dict["body_orientation"] = 0.8 * np.linalg.norm([up_rel[0], up_rel[1]]) * 0.1
+        self.cost_dict["body_orientation"] += 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]]) * 0.1
         cost += self.cost_dict["body_orientation"]
         
         # Body movement cost
-        self.cost_dict["body_movement"] = 0.01 * np.linalg.norm(self.data.sensor("body-gyro").data)
-        self.cost_dict["body_movement"] += 0.01 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
+        self.cost_dict["body_movement"] = 0.01 * np.linalg.norm(self.data.sensor("body-gyro").data) * 0.1
+        self.cost_dict["body_movement"] += 0.01 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8])) * 0.1
         cost += self.cost_dict["body_movement"]
 
 
@@ -356,7 +356,7 @@ class SliderEnv(Env):
         cost += self.cost_dict['action_reg']
 
         # Add a constant offset to prevent early termination
-        reward = (20.0 - cost) / 1000.0
+        reward = (5.0 - cost) / 1000.0
 
         # Return reward
         return reward

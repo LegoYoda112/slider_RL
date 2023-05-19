@@ -11,7 +11,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "model_v7-9-fromscratch"
+trial_name = "model_v7-18-fromscratch"
 model_save_path = "./trained_models/" + trial_name
 
 
