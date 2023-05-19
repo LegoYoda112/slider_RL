@@ -6,19 +6,14 @@ import numpy as np
 
 from stable_baselines3 import PPO
 
-env = SliderEnv()
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.003, 
-      tensorboard_log="./trained_models/tensorboard")
-# n_steps = int(8192 * 0.5),
-timesteps = 100_000
-total_timesteps = 0
 
-trial_name = "new_model_new_obs_forward-56-omni"
+trial_name = "model_v4-3"
 model_save_path = "./trained_models/" + trial_name
 
+env = SliderEnv(trial_name)
 
-model =  PPO.load(model_save_path + "/model-69", env=env)
+model =  PPO.load(model_save_path + "/model-92", env=env)
 
 forward = False
 
@@ -119,7 +114,7 @@ while True:
         # if(done):
         #     env.reset()
 
-        time.sleep(0.01)
+        time.sleep(0.005)
         # input()
         # time.sleep(0.1)
 

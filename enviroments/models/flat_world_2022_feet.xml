@@ -28,7 +28,7 @@
     </asset>
 
     <asset>
-        <hfield name="field" file="snowdon.png" size = "5 5 0.1 1"/>
+        <hfield name="field" file="snowdon.png" size = "5 5 0.2 1"/>
     </asset>
 
     <!-- Include slider urdf -->
@@ -41,19 +41,30 @@
         <light directional="true" diffuse=".6 .6 .6" specular="0.2 0.2 0.2" pos="0 0 4" dir="0 0 -1"/>
 
         <!-- Flat ground plane -->
-        <!-- <geom type="hfield" hfield="field" pos = "0 0 -0.0"/> -->
+        <!-- <geom type="hfield" hfield="field" pos = "3 0 -0.1" rgba = "0.2 0.2 0.2 1.0"/> -->
 
         <geom name="ground" type="plane" size="0 0 1" pos="0 0 0.1" quat="1 0 0 0" material="matplane" condim="1"/>
+<!-- 
+        <geom type = "box" size = "0.15 5 1" pos = "0.0 0 -0.88"/>
 
-        <!-- <geom name="obstical2" type = "box" size = "1 5 1" pos = "8 0 -0.88"/>
+        <geom type = "box" size = "1 0.2 1" pos = "2 0 -0.87"/>
+        <geom type = "box" size = "1 0.2 1" pos = "2 -1 -0.87"/>
+        <geom type = "box" size = "1 0.2 1" pos = "2 1 -0.87"/>
+        <geom type = "box" size = "1 0.2 1" pos = "2 2 -0.87"/>
+        <geom type = "box" size = "1 0.2 1" pos = "2 -2 -0.87"/>
+ 
+        <geom type = "box" size = "1.0 5 1" pos = "3.5 0 -0.88"/>
+        <geom type = "box" size = "0.75 5 1" pos = "3.5 0 -0.86"/>
+        <geom type = "box" size = "0.5 5 1" pos = "3.5 0 -0.83"/>  -->
 
-        <geom name="obstical3" type = "box" size = "2 5 1" pos = "12 0 -0.87"/>
 
-        <geom type = "box" size = "0.2 0.2 1.0" pos = "1.2 -0.2 -0.87" />
-        <geom type = "box" size = "0.2 0.2 1.0" pos = "0.1 -0.2 -0.88" />
-        <geom type = "box" size = "0.2 0.2 1.0" pos = "0.6 0.1 -0.89" />
-        <geom type = "box" size = "0.2 0.2 1.0" pos = "2 -0.0 -0.89" />
-        <geom type = "box" size = "0.2 0.2 1.0" pos = "0.2 0 -0.89" /> -->
+        <!-- <geom type = "box" size = "2.0 5 1" pos = "3.5 0 -0.87"/>
+        <geom type = "box" size = "1.5 5 1" pos = "3.5 0 -0.85"/>
+        <geom type = "box" size = "1.0 5 1" pos = "3.5 0 -0.82"/>
+        <geom type = "box" size = "0.5 5 1" pos = "3.5 0 -0.80"/>
+
+        <geom type = "box" quat = "0.9 0 -0.03 0" size = "2 5 1" pos = "5 0 -0.80"/> -->
+
 
         <!-- <geom name="obstical4" type = "box" size = "1 5 1" pos = "-0.0 0 -0.90" />
         <geom name="obstical5" type = "box" size = "0.73 5 1" pos = "-0.0 0 -0.90"/>
