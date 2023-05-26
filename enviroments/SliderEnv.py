@@ -93,8 +93,8 @@ class SliderEnv(Env):
 
         # Reset desired reference velocity
         # x, y, theta
-        # self.v_ref = (np.random.uniform(0.5, -0.5), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
-        self.v_ref = (0.5, 0.0, 0.0)
+        self.v_ref = (np.random.uniform(0.5, -0.5), np.random.uniform(0.0, 0.0), np.random.uniform(-0.0, 0.0))
+        # self.v_ref = (0.5, 0.0, 0.0)
 
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
@@ -281,7 +281,7 @@ class SliderEnv(Env):
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 1.0
+        slide_factor = 0.1
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
@@ -301,7 +301,7 @@ class SliderEnv(Env):
         actuator_effort += self.actuator_power("Left_Foot_Pitch") ** 2 * ankle_factor
         actuator_effort += self.actuator_power("Right_Foot_Pitch") ** 2 * ankle_factor
         
-        self.cost_dict["effort"] = actuator_effort / 50000.0
+        self.cost_dict["effort"] = actuator_effort / 100000.0
         cost += self.cost_dict["effort"]
         
         actuator_force = 0
@@ -324,7 +324,7 @@ class SliderEnv(Env):
         cost += self.cost_dict["force"]
 
         # Body velocity cost
-        self.cost_dict["body_vel"] = 10.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 2.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
+        self.cost_dict["body_vel"] = 50.0 * (self.v_ref[0] - self.data.qvel[0]) ** 2 + 20.0 * (self.v_ref[1] - self.data.qvel[1]) ** 2
 
         # if(self.cost_dict["body_vel"] < 0.001):
         #     self.cost_dict["body_vel"] = 0.0
@@ -342,13 +342,13 @@ class SliderEnv(Env):
         forward_rel = np.zeros(3)
         mj.mju_rotVecQuat(forward_rel, forward, quat)
 
-        self.cost_dict["body_orientation"] = 0.8 * np.linalg.norm([up_rel[0], up_rel[1]]) * 0.1
-        self.cost_dict["body_orientation"] += 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]]) * 0.1
+        self.cost_dict["body_orientation"] = 0.8 * np.linalg.norm([up_rel[0], up_rel[1]]) * 5.0
+        self.cost_dict["body_orientation"] += 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]])
         cost += self.cost_dict["body_orientation"]
         
         # Body movement cost
-        self.cost_dict["body_movement"] = 0.01 * np.linalg.norm(self.data.sensor("body-gyro").data) * 0.1
-        self.cost_dict["body_movement"] += 0.01 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8])) * 0.1
+        self.cost_dict["body_movement"] = 0.05 * np.linalg.norm(self.data.sensor("body-gyro").data)
+        self.cost_dict["body_movement"] += 0.05 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
         cost += self.cost_dict["body_movement"]
 
 

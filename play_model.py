@@ -8,12 +8,12 @@ from stable_baselines3 import PPO
 
 
 
-trial_name = "model_v7-2"
+trial_name = "model_v7-24"
 model_save_path = "./trained_models/" + trial_name
 
 env = SliderEnv(trial_name)
 
-model =  PPO.load(model_save_path + "/model-8", env=env)
+model =  PPO.load(model_save_path + "/model-15", env=env)
 
 forward = False
 
@@ -114,7 +114,7 @@ while True:
         # if(done):
         #     env.reset()
 
-        time.sleep(0.005)
+        time.sleep(0.01)
         # input()
         # time.sleep(0.1)
 

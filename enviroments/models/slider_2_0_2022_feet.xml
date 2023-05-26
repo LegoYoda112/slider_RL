@@ -9,30 +9,30 @@
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
     <default class = "hip_roll_pos">
-      <position kp="300.0" ctrllimited="true" forcelimited = "true" forcerange = "-140 140" ctrlrange="-0.3 0.3"/>
+      <position kp="200.0" ctrllimited="true" forcelimited = "true" forcerange = "-140 140" ctrlrange="-0.3 0.3"/>
     </default>
 
     <default class = "hip_roll_vel">
       <!-- -144 144 -->
-      <velocity  kv="10.0" forcelimited = "true" forcerange = "-140 140" group="1" gear = "1"/>
+      <velocity  kv="15.0" forcelimited = "true" forcerange = "-140 140" group="1" gear = "1"/>
     </default>
 
     <default class = "hip_pitch_pos">
-      <position kp="300.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
+      <position kp="200.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
     </default>
 
     <default class = "hip_pitch_vel">
       <!-- -65 65 -->
-      <velocity  kv="8.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+      <velocity  kv="7.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
     </default>
 
  
     <default class = "slide_joint">
-      <position kp="5000.0" ctrllimited="true" forcelimited = "true" gear="1" forcerange = "-600 600"/>
+      <position kp="1000.0" ctrllimited="true" forcelimited = "true" gear="1" forcerange = "-600 600"/>
     </default>
 
     <default class = "slide_vel">
-      <velocity kv="100.0"  forcelimited = "true" group="1" gear = "1" forcerange = "-600 600"/>
+      <velocity kv="200.0"  forcelimited = "true" group="1" gear = "1" forcerange = "-600 600"/>
     </default>
 
     <default class = "foot_joint">

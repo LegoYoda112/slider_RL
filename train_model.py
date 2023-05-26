@@ -11,7 +11,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "model_v7-18-fromscratch"
+trial_name = "model_v7-25-fromscratch"
 model_save_path = "./trained_models/" + trial_name
 
 
@@ -26,10 +26,10 @@ model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003,
 load = False
 
 if(load): 
-    trial_load_name = "model_v7-2"
+    trial_load_name = "model_v7-23"
     model_save_path_load = "./trained_models/" + trial_load_name
 
-    model =  PPO.load(model_save_path_load + "/model-17", env=env, learning_rate = 0.001)
+    model =  PPO.load(model_save_path_load + "/model-55", env=env, learning_rate = 0.0003)
 
 # Make save path
 try:
