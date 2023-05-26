@@ -164,7 +164,7 @@ class SliderEnv(Env):
         
         # If we've fallen over, stop the episode6
         if(self.data.body("base_link").xpos[2] < 0.4):
-            reward -= 0.0
+            reward -= 1.0
             done = True
         
         # if(np.random.random() < self.v_ref_change_prob):
@@ -188,11 +188,11 @@ class SliderEnv(Env):
 
         # ====== Left foot
         # Roll Pitch
-        self.data.ctrl[0] = action[0] * 0.3 * scale
+        self.data.ctrl[0] = action[0] * 0.4 * scale
         self.data.ctrl[2] = action[1] * 0.4 * scale
         
         # Slide
-        self.data.ctrl[4] = action[2] * 0.05 * scale
+        self.data.ctrl[4] = action[2] * 0.1 * scale
 
         # Foot Roll Pitch
         self.data.ctrl[6] = action[3] * 0.3 * scale
@@ -200,11 +200,11 @@ class SliderEnv(Env):
 
         # ====== Right foot
         # Roll Pitch
-        self.data.ctrl[10] = action[5] * 0.3 * scale
+        self.data.ctrl[10] = action[5] * 0.4 * scale
         self.data.ctrl[12] = action[6] * 0.4 * scale
         
         # Slide
-        self.data.ctrl[14] = action[7] * 0.05 * scale
+        self.data.ctrl[14] = action[7] * 0.1 * scale
 
         # Foot Roll Pitch
         self.data.ctrl[16] = action[8] * 0.3 * scale
@@ -281,7 +281,7 @@ class SliderEnv(Env):
         cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 0.1
+        slide_factor = 2.0
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
@@ -350,7 +350,6 @@ class SliderEnv(Env):
         self.cost_dict["body_movement"] = 0.05 * np.linalg.norm(self.data.sensor("body-gyro").data)
         self.cost_dict["body_movement"] += 0.05 * np.linalg.norm(self.data.sensor("body-accel").data - np.array([0,0,9.8]))
         cost += self.cost_dict["body_movement"]
-
 
         self.cost_dict['action_reg'] = np.sum(self.action**2) * 0.0
         cost += self.cost_dict['action_reg']

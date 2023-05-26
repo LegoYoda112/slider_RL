@@ -1,5 +1,5 @@
 <mujoco model="slider_joint_control">
-  <compiler angle="radian" meshdir="../meshes/" autolimits="true"/>
+  <compiler angle="radian" meshdir="../meshes/" autolimits="true"  balanceinertia="true"/>
   <!-- <size njmax="500" nconmax="100"/> -->
   
   <!-- Default values -->
@@ -14,7 +14,7 @@
 
     <default class = "hip_roll_vel">
       <!-- -144 144 -->
-      <velocity  kv="15.0" forcelimited = "true" forcerange = "-140 140" group="1" gear = "1"/>
+      <velocity  kv="20.0" forcelimited = "true" forcerange = "-140 140" group="1" gear = "1"/>
     </default>
 
     <default class = "hip_pitch_pos">
@@ -23,12 +23,12 @@
 
     <default class = "hip_pitch_vel">
       <!-- -65 65 -->
-      <velocity  kv="7.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+      <velocity  kv="20.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
     </default>
 
  
     <default class = "slide_joint">
-      <position kp="1000.0" ctrllimited="true" forcelimited = "true" gear="1" forcerange = "-600 600"/>
+      <position kp="2000.0" ctrllimited="true" forcelimited = "true" gear="1" forcerange = "-600 600"/>
     </default>
 
     <default class = "slide_vel">
@@ -40,7 +40,7 @@
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="5.0" group="1" gear ="1" forcerange = "-15 15"/>
+        <velocity forcelimited="true" kv="1.0" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 
@@ -84,7 +84,7 @@
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
         <inertial pos="0.003 0.003 0.0" mass="2.317" fullinertia="0.003 0.005 0.005 -9.851e-7 1.129e-7 -4.134e-6"/>
-        <joint name="Right_Roll" pos="0 0 0" axis="-1 0 0" range="-1.57 0.35" damping="2.0" solreffriction="1.0" solimpfriction="1.0" frictionloss="0.5"/>
+        <joint name="Right_Roll" pos="0 0 0" axis="-1 0 0" range="-1.57 0.35" damping="1.0" solreffriction="0.1" solimpfriction="0.1" frictionloss="0.1"/>
         <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Pitch_Casing"/>
         <body name="Right_Slide_Casing" pos="0 -0.1042 0">
           <inertial pos="-0.034 -0.027 0.001" mass="1.6" fullinertia="0.003 0.003 0.003 -4.546e-4 3.909e-5 -3.650e-5"/>
@@ -93,15 +93,15 @@
           <body name="Right_Leg" pos="0 0 -0.7">
             <inertial pos="-0.037 0.0 -0.237" mass="1.84" fullinertia="0.204 0.205 0.003 -7.479e-7 -0.01 6.440e-6"/>
 
-            <joint name="Right_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26" damping="10.0" solreffriction="1.0" solimpfriction="1.0" frictionloss="1.0"/>
+            <joint name="Right_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26" damping="1.0" solreffriction="0.1" solimpfriction="0.5" frictionloss="0.5"/>
             <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Leg"/>
             <body name="Right_Foot_Pitch_Link" pos="0 0 0">
               <inertial pos="0.0 0.0 0.0" mass="0.039" fullinertia="4.354e-6 4.402e-6 4.148e-6 0.0 0.0 0.0"/>
-              <joint name="Right_Foot_Pitch" pos="0 0 0" axis="0 1 0" range="-0.52 0.52" solreffriction="1" solimpfriction="1" frictionloss="1.0"/>
+              <joint name="Right_Foot_Pitch" pos="0 0 0" axis="0 1 0" range="-0.52 0.52"/>
               <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot_Pitch_Link"/>
               <body name="Right_Foot" pos="0 0 0">
                 <inertial pos="-0.015 0.0 -0.029" mass="0.917" fullinertia="0.002 0.004 0.006 -1.108e-7 2.353e-4 3.204e-8"/>
-                <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52" solreffriction="1" solimpfriction="1" frictionloss="1.0"/>
+                <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/>
                 <geom name = "Right_Foot_Contact" type = "box" size = "0.115 0.085 0.018" pos = "0 0 -0.031" rgba = "0.5 0.5 0.5 0.0"/>
                  <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
@@ -117,7 +117,7 @@
       </body>
       <body name="Left_Pitch_Casing" pos="0 0.075 0">
         <inertial pos="0.003 -0.003 0.0" mass="2.317" fullinertia="0.003 0.005 0.005 -9.851e-7 1.129e-7 -4.134e-6"/>
-        <joint name="Left_Roll" pos="0 0 0" axis="-1 0 0" range="-0.35 1.57" damping="2.0" solreffriction="1.0" solimpfriction="1.0" frictionloss="0.5"/>
+        <joint name="Left_Roll" pos="0 0 0" axis="-1 0 0" range="-0.35 1.57" damping="1.0" solreffriction="0.5" solimpfriction="0.5" frictionloss="0.5"/>
 
         <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Pitch_Casing"/>
         <body name="Left_Slide_Casing" pos="0 0.1042 0">
@@ -127,15 +127,15 @@
           <body name="Left_Leg" pos="0 0 -0.7">
             <inertial pos="-0.037 0.0 -0.237" mass="1.84" fullinertia="0.204 0.205 0.003 -7.479e-7 -0.01 6.440e-6"/>
 
-            <joint name="Left_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26"  damping="10.0" solreffriction="1.0" solimpfriction="1.0" frictionloss="1.0"/>
+            <joint name="Left_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26"  damping="1.0" solreffriction="0.5" solimpfriction="0.5" frictionloss="0.5"/>
             <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Leg"/>
             <body name="Left_Foot_Pitch_Link" pos="0 0 0">
               <inertial pos="0.0 0.0 0.0" mass="0.039" fullinertia="4.354e-6 4.402e-6 4.148e-6 0.0 0.0 0.0"/>
-              <joint name="Left_Foot_Pitch" pos="0 0 0" axis="0 -1 0" range="-0.52 0.52" solreffriction="1" solimpfriction="1" frictionloss="1.0"/>
+              <joint name="Left_Foot_Pitch" pos="0 0 0" axis="0 -1 0" range="-0.52 0.52"/>
               <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot_Pitch_Link"/>
               <body name="Left_Foot" pos="0 0 0">
                 <inertial pos="-0.015 0.0 -0.029" mass="0.917" fullinertia="0.002 0.004 0.006 -1.108e-7 2.353e-4 3.204e-8"/>
-                <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52" solreffriction="1" solimpfriction="1" frictionloss="1.0"/>
+                <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <geom name = "Left_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/>
                 <geom name = "Left_Foot_Contact" type = "box" size = "0.115 0.085 0.018" mass = "0" pos = "0 0 -0.031" rgba = "0.5 0.5 0.5 0.0"/>
                 <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>

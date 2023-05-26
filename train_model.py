@@ -11,9 +11,8 @@ from stable_baselines3.common.callbacks import BaseCallback
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "model_v7-25-fromscratch"
+trial_name = "model_v8-forward-higher-damping"
 model_save_path = "./trained_models/" + trial_name
-
 
 
 env = SliderEnv(trial_name)
