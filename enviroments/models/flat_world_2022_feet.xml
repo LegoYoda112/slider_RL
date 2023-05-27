@@ -46,9 +46,9 @@
 
         <geom name="ground" type="plane" size="0 0 1" pos="0 0 0.1" quat="1 0 0 0" material="matplane" condim="1"/>
 
-        <geom type = "box" size = "0.15 5 1" pos = "0.0 0 -0.88"/>
+        <!-- <geom type = "box" size = "0.15 5 1" pos = "0.0 0 -0.88"/> -->
 
-        <geom type = "box" size = "1 0.2 1" pos = "2 0 -0.87"/>
+        <!-- <geom type = "box" size = "1 0.2 1" pos = "2 0 -0.87"/>
         <geom type = "box" size = "1 0.2 1" pos = "2 -1 -0.87"/>
         <geom type = "box" size = "1 0.2 1" pos = "2 1 -0.87"/>
         <geom type = "box" size = "1 0.2 1" pos = "2 2 -0.87"/>
@@ -56,7 +56,7 @@
  
         <geom type = "box" size = "1.0 5 1" pos = "3.5 0 -0.88"/>
         <geom type = "box" size = "0.75 5 1" pos = "3.5 0 -0.86"/>
-        <geom type = "box" size = "0.5 5 1" pos = "3.5 0 -0.83"/> 
+        <geom type = "box" size = "0.5 5 1" pos = "3.5 0 -0.83"/>  -->
 
 
         <!-- <geom type = "box" size = "2.0 5 1" pos = "3.5 0 -0.87"/>
