@@ -11,24 +11,24 @@ from stable_baselines3.common.callbacks import BaseCallback
 timesteps = 100_000
 total_timesteps = 0
 
-trial_name = "model_v8-forward-higher-damping"
+trial_name = "model_v14-forward2-7"
 model_save_path = "./trained_models/" + trial_name
 
 
 env = SliderEnv(trial_name)
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
-      tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 1))
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.00005, 
+      tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
 
 # n_steps = int(8192 * 0.5)
 
-load = False
+load = True
 
 if(load): 
-    trial_load_name = "model_v7-23"
+    trial_load_name = "model_v14-forward2-1"
     model_save_path_load = "./trained_models/" + trial_load_name
 
-    model =  PPO.load(model_save_path_load + "/model-55", env=env, learning_rate = 0.0003)
+    model =  PPO.load(model_save_path_load + "/model-50", env=env, learning_rate = 0.00005)
 
 # Make save path
 try:
@@ -57,7 +57,11 @@ class TensorboardCallback(BaseCallback):
 #Seed the enviroment
 env.seed(420)
 
+fast_lr = True
+
 while True:
+
+
     total_timesteps += timesteps
     model.learn(total_timesteps=timesteps, tb_log_name = trial_name, reset_num_timesteps = False, callback=TensorboardCallback())
     model.save("trained_models/" + trial_name + "/" "model-" + str(int(total_timesteps / timesteps)))
