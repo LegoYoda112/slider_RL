@@ -4,118 +4,66 @@ import os
 import glob
 import numpy as np 
 
+from matplotlib import pyplot as plt
+
 from stable_baselines3 import PPO
 
 
-
-trial_name = "model_v14-forward2-1"
+trial_name = "model_v15-forward3-1"
 model_save_path = "./trained_models/" + trial_name
 
 env = SliderEnv(trial_name)
 
-model =  PPO.load(model_save_path + "/model-68", env=env)
+model =  PPO.load(model_save_path + "/model-25", env=env)
 
-forward = False
-
-speed = 1.0
-
-target_x = 0.0
-target_y = 0.0
-
-i = 0
-
-
-while True:
+def trial_force(force, render = False):
     # Reset enviroment
     obs = env.reset()
 
-    # Render things
-    for i in range(10000):
-        i+=1
+    env.purtrub_max = [0,0,0]
+    env.step_time = 0.8
+    env.max_ep_time = 100 # seconds
+
+    offset = int(np.random.random() * 30)
+
+    for i in range(300):
+
+
+        if(i == 100 + offset):
+            env.apply_force(force)
 
         action, _state = model.predict(obs, deterministic=True)
 
-        print(action)
-        print()
-
-        # i = 0
-        # for value in obs:
-        #     print(round(value, 2), i)
-        #     i += 1
-
-        # print()
-
-        # action = [-1.0, -1.0, -1.0, -1.0, -1.0,  -1.0, -1.0, -1.0, -1.0, -1.0]
-
-        # print(action)
-
-        # pos = [
-        #           obs[18],
-        #           obs[22],
-        #           obs[14],
-        #           obs[30],
-        #           obs[26],
-
-        #           obs[20],
-        #           obs[24],
-        #           obs[16],
-        #           obs[32],
-        #           obs[28],
-        # ]
-        # # write a row to the csv file
-        # # writer.writerow(action)
-        # print(pos)
-        # writer.writerow(pos)
-
-        # if i > 50:
-        #     speed = 1.0
-
-        # if i > 2 * np.pi * 150:
-        #     speed = 0.0
-
-        # env.v_ref = [0.8, 0.0]
-
-        # if forward:
-        #     env.v_ref = [0.8, 0]
-        # else:
-        #     env.v_ref = [0.0, 0]
-        # p_x = env.data.qpos[0]
-        # p_y = env.data.qpos[1]
-
-        # print(p_x, p_y)
-
-        # env.v_ref = [(np.sin(i / 100)) * 0.4 + 0.4, 0.0, 0.0
-
-        # if(abs(p_x - target_x) < 0.1 and abs(p_y - target_y) < 0.1):
-        #     target_x = np.random.uniform(-1, 1)
-        #     target_y = np.random.uniform(-1, 1)
-
-        
-        # print((target_x - p_x), (target_y - p_y))
-
-        # env.v_ref = [max(-0.3, min(0.3, (target_x - p_x) * 1.0)), max( -0.4, min(0.4, (target_y - p_y) * 1.0)), 0.0]
-       #  env.v_ref = [0.2, 0, 0]
-        # env.v_ref = [(np.cos(i / 150))/2.0 * speed, (np.sin(i / 150))/2.0 * speed, 0.0]
-        #    print("SWITCH")
-
         obs, reward, done, info = env.step(action)
-        env.render()
 
-        #quat = np.array([obs[10], obs[11], obs[12], obs[13]])
-        #print(quat)
+        if render:
+            env.render()
 
-        # print(round(obs[-2], 2))
-        # print(obs[1])
-        # print(obs[2])
-        # print(reward)
-        # print(reward)
-        # print(0.1 + 200 * (action[10:15] + 1) * 0.5 + 50)
+        # Fail
+        if done:
+            return False
 
-        # if(done):
-        #     env.reset()
+    # Sucsess    
+    return True
 
-        time.sleep(0.01)
-        # input()
-        # time.sleep(0.1)
+trials_per = 10
+force_values = np.linspace(-750, 750, 100)
+sucsess_nums = np.zeros(force_values.shape)
 
-writer.close()
+for i in range(force_values.shape[0]):
+    force_value = force_values[i]
+
+    sucsess_num_trial = 0
+    for num in range(trials_per):
+        sucsess = trial_force([0, force_value, 0], False)
+
+        sucsess_num_trial += int(sucsess)
+
+    sucsess_nums[i] = sucsess_num_trial
+
+    print(force_value)
+    print(sucsess_num_trial)
+
+
+plt.plot(force_values, sucsess_nums)
+plt.show()

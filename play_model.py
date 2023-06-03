@@ -8,12 +8,12 @@ from stable_baselines3 import PPO
 
 
 
-trial_name = "model_v14-forward2-1"
+trial_name = "model_v15-forward3-5-3-stairs"
 model_save_path = "./trained_models/" + trial_name
 
 env = SliderEnv(trial_name)
 
-model =  PPO.load(model_save_path + "/model-68", env=env)
+model =  PPO.load(model_save_path + "/model-49", env=env)
 
 forward = False
 
@@ -29,11 +29,13 @@ while True:
     # Reset enviroment
     obs = env.reset()
 
+    env.step_time = 1.0
+
     # Render things
     for i in range(10000):
         i+=1
 
-        action, _state = model.predict(obs, deterministic=True)
+        action, _state = model.predict(obs, deterministic=False)
 
         print(action)
         print()
@@ -114,7 +116,7 @@ while True:
         # if(done):
         #     env.reset()
 
-        time.sleep(0.01)
+        time.sleep(0.012)
         # input()
         # time.sleep(0.1)
 

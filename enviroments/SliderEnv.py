@@ -17,7 +17,7 @@ class SliderEnv(Env):
         self.max_ep_time = 20 # Seconds
 
         # Gait params
-        self.step_time = 0.8 # s - time per step
+        self.step_time = 1.0 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -28,8 +28,10 @@ class SliderEnv(Env):
         self.action_noise_scale = 0.01
         self.action_offset_noise_scale = 0.01
 
-        self.purtrub_max = [100,100,100] # Newtons
+        self.purtrub_max = [0,0,0] # Newtons
         self.purtrub_prob = 0.001 # Probability per timestep
+        self.purtrub_count = 100
+        self.purtrub_timesteps = 5
 
         self.v_ref_change_prob = 0.001
         self.v_ref = [0,0,0]
@@ -99,11 +101,12 @@ class SliderEnv(Env):
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
         # Randomize starting position and velocity
-        # self.data.qpos[0] = np.random.uniform(-1, 1)
-        self.data.qpos[0] = np.random.uniform(-1.0, -0.5)
+        #self.data.qpos[0] = np.random.uniform(-1, 1)
+        self.data.qpos[2] = 0.85
+        #self.data.qpos[0] = np.random.uniform(-1.0, -0.5)
         self.data.qvel[0] = np.random.uniform(-0.2, 0.2)
 
-        self.data.qpos[1] = np.random.uniform(-1.0, 1.0)
+        #self.data.qpos[1] = np.random.uniform(-1.0, 1.0)
         self.data.qvel[1] = np.random.uniform(-0.2, 0.2)
 
         self.state_history = np.zeros(self.state_size * self.state_history_length)
@@ -128,9 +131,21 @@ class SliderEnv(Env):
         torso_y = torso_pos[1]
         self.cam.lookat = (torso_x, torso_y, 0.75)
         self.cam.azimuth = self.data.time * 10
+
+
+        self.cam.lookat = (2, 0, 0.7)
+        self.cam.distance = 10
+        self.cam.azimuth = 90
+        self.cam.elevation = 0
+
+
+        self.cam.azimuth = 30
+        self.cam.elevation = -20
+
+
+
         # self.data.time * 10
         # self.cam.azimuth = 45
-        self.cam.elevation = -20
 
         # Render out an image of the enviroment
         viewport = mj.MjrRect(0, 0, int(3000/1.0), int(1500/1.0))
@@ -143,6 +158,14 @@ class SliderEnv(Env):
         return
 
     def step(self, action):
+
+        # Apply a purturbation
+        if(np.random.rand() < self.purtrub_prob):
+            # print("BONK")
+            F_x = np.random.normal() * self.purtrub_max[0]
+            F_y = np.random.normal() * self.purtrub_max[1]
+            F_z = np.random.normal() * self.purtrub_max[2]
+            self.data.xfrc_applied[2] = [F_x,F_y,F_z,  0,0,0]
 
         # Perform an action
         self.act(action)
@@ -171,20 +194,22 @@ class SliderEnv(Env):
         #     # print("vref change!")
         #     self.v_ref = (np.random.uniform(1.0, 0.0), np.random.uniform(-0.0, 0.0), np.random.uniform(-0.0, 0.0))
 
+        if(self.purtrub_count < self.purtrub_timesteps):
+            self.purtrub_count += 1
+        else:
+            self.data.xfrc_applied[2] = [0,0,0,  0,0,0]
+
         info = {}
 
         return observation, reward, done, info
 
     def apply_force(self, force):
-        # Apply a purturbation
-        if(np.random.rand() < self.purtrub_prob):
-            # print("BONK")
-            F_x = force[0]
-            F_y = force[1]
-            F_z = force[2]
-            self.data.xfrc_applied[2] = [F_x,F_y,F_z,  0,0,0]
-        else:
-            self.data.xfrc_applied[2] = [0,0,0,  0,0,0]
+        F_x = force[0]
+        F_y = force[1]
+        F_z = force[2]
+        self.data.xfrc_applied[2] = [F_x,F_y,F_z,  0,0,0]
+
+        self.purtrub_count = 0
 
     # Apply an action
     def act(self, action):
@@ -197,39 +222,48 @@ class SliderEnv(Env):
 
         scale = 1.0
 
-        # ====== Left foot
-        # Roll Pitch
-        self.data.ctrl[0] = action[0] * 0.5 * scale
-        self.data.ctrl[2] = action[1] * 0.8 * scale
+        # Force control
+
+        self.data.actuator("Left_Slide").ctrl = action[0] * 300
+        self.data.actuator("Right_Slide").ctrl = action[1] * 300
+
+        self.data.actuator("Left_Roll").ctrl = action[2] * 100
+        self.data.actuator("Right_Roll").ctrl = action[3] * 100
+
+        self.data.actuator("Left_Pitch").ctrl = action[4] * 65
+        self.data.actuator("Right_Pitch").ctrl = action[5] * 65
+
+        self.data.actuator("Left_Foot_Pitch").ctrl = action[6] * 15
+        self.data.actuator("Right_Foot_Pitch").ctrl = action[7] * 15
+
+        self.data.actuator("Left_Foot_Pitch").ctrl = action[8] * 15
+        self.data.actuator("Right_Foot_Pitch").ctrl = action[9] * 15
+
+        # self.data.actuator("Left_Slide").ctrl = -100
+
+        # # ====== Left foot
+        # # Roll Pitch
+        # self.data.ctrl[0] = action[0] * 0.5 * scale
+        # self.data.ctrl[2] = action[1] * 0.8 * scale
         
-        # Slide
-        self.data.ctrl[4] = action[2] * 0.1 * scale
+        # # Slide
+        # self.data.ctrl[4] = action[2] * 0.1 * scale
 
-        # Foot Roll Pitch
-        self.data.ctrl[6] = action[3] * 0.5 * scale
-        self.data.ctrl[8] = action[4] * 0.5 * scale
+        # # Foot Roll Pitch
+        # self.data.ctrl[6] = action[3] * 0.5 * scale
+        # self.data.ctrl[8] = action[4] * 0.5 * scale
 
-        # ====== Right foot
-        # Roll Pitch
-        self.data.ctrl[10] = action[5] * 0.4 * scale
-        self.data.ctrl[12] = action[6] * 0.8 * scale
+        # # ====== Right foot
+        # # Roll Pitch
+        # self.data.ctrl[10] = action[5] * 0.4 * scale
+        # self.data.ctrl[12] = action[6] * 0.8 * scale
         
-        # Slide
-        self.data.ctrl[14] = action[7] * 0.1 * scale
+        # # Slide
+        # self.data.ctrl[14] = action[7] * 0.1 * scale
 
-        # Foot Roll Pitch
-        self.data.ctrl[16] = action[8] * 0.5 * scale
-        self.data.ctrl[18] = action[9] * 0.5 * scale
-
-        # Apply a purturbation
-        if(np.random.rand() < self.purtrub_prob):
-            # print("BONK")
-            F_x = np.random.normal() * self.purtrub_max[0]
-            F_y = np.random.normal() * self.purtrub_max[1]
-            F_z = np.random.normal() * self.purtrub_max[2]
-            self.data.xfrc_applied[2] = [F_x,F_y,F_z,  0,0,0]
-        else:
-            self.data.xfrc_applied[2] = [0,0,0,  0,0,0]
+        # # Foot Roll Pitch
+        # self.data.ctrl[16] = action[8] * 0.5 * scale
+        # self.data.ctrl[18] = action[9] * 0.5 * scale
 
     # Calculate current actuator power
     def actuator_power(self, actuator_name):
