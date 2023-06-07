@@ -32,7 +32,7 @@
     </default>
 
     <default class = "slide_vel">
-      <velocity kv="100.0"  forcelimited = "true" group="1" gear = "1" forcerange = "-600 600"/>
+      <velocity kv="200.0"  forcelimited = "true" group="1" gear = "1" forcerange = "-600 600"/>
     </default>
 
     <default class = "foot_joint">
@@ -82,7 +82,7 @@
 
       <inertial pos="-0.075 0.0 -0.073" mass="3.791" fullinertia="0.036 0.026 0.051 -8.215e-7 -0.004 9.804e-6"/>
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link" conaffinity = "0" contype = "0"/>
-      <!-- <geom type = "box" size = "0.1 0.1 0.2" pos = "0.04 0 0.15" mass="10"/> -->
+      <!-- <geom type = "box" size = "0.1 0.1 0.4" pos = "0.04 0 0.45" mass="4"/> -->
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
         <inertial pos="0.003 0.003 0.0" mass="2.317" fullinertia="0.003 0.005 0.005 -9.851e-7 1.129e-7 -4.134e-6"/>
         <joint name="Right_Roll" pos="0 0 0" axis="-1 0 0" range="-1.57 0.35"/>
@@ -180,7 +180,7 @@
 
         <!-- Right leg control -->
 
-        <motor name="Right_Roll" joint="Right_Roll" forcerange="-144 144"/>
+        <!-- <motor name="Right_Roll" joint="Right_Roll" forcerange="-144 144"/>
 
         <motor name="Right_Pitch" joint="Right_Pitch" forcerange="-65 65"/>
 
@@ -198,10 +198,10 @@
 
         <motor name="Left_Foot_Roll" joint="Left_Foot_Roll" forcerange="-15 15"/>
 
-        <motor name="Left_Foot_Pitch" joint="Left_Foot_Pitch" forcerange="-15 15"/>
+        <motor name="Left_Foot_Pitch" joint="Left_Foot_Pitch" forcerange="-15 15"/> -->
         
 
-        <!-- <position name="Right_Roll" joint="Right_Roll" class="hip_roll_pos"/>
+        <position name="Right_Roll" joint="Right_Roll" class="hip_roll_pos"/>
         <velocity joint="Right_Roll" class="hip_roll_vel"/>
 
         <position name="Right_Pitch" joint="Right_Pitch" class="hip_pitch_pos"/>
@@ -229,7 +229,7 @@
         <velocity joint="Left_Foot_Roll" class = "foot_vel"/>
 
         <position name="Left_Foot_Pitch" joint="Left_Foot_Pitch" ctrlrange="-0.5 0.5" class="foot_joint"/>
-        <velocity joint="Left_Foot_Pitch" class = "foot_vel"/> -->
+        <velocity joint="Left_Foot_Pitch" class = "foot_vel"/>
     </actuator>
 
     <!-- Sensors -->

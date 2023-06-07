@@ -14,10 +14,10 @@ class SliderEnv(Env):
         # ======= PARAMS ======
         # Sim params
         self.sim_steps = 10
-        self.max_ep_time = 20 # Seconds
+        self.max_ep_time = 200 # Seconds
 
         # Gait params
-        self.step_time = 1.0 # s - time per step
+        self.step_time = 0.8 # s - time per step
         self.stance_time = self.step_time/2.0 # time per stance
         self.phase_offset = 0.5 # percent offset between leg phases
 
@@ -28,7 +28,7 @@ class SliderEnv(Env):
         self.action_noise_scale = 0.01
         self.action_offset_noise_scale = 0.01
 
-        self.purtrub_max = [0,0,0] # Newtons
+        self.purtrub_max = [10, 10, 10] # Newtons
         self.purtrub_prob = 0.001 # Probability per timestep
         self.purtrub_count = 100
         self.purtrub_timesteps = 5
@@ -101,15 +101,24 @@ class SliderEnv(Env):
         self.action_offset_noise = np.random.normal(size=(10)) * self.action_offset_noise_scale
 
         # Randomize starting position and velocity
-        #self.data.qpos[0] = np.random.uniform(-1, 1)
-        self.data.qpos[2] = 0.85
-        #self.data.qpos[0] = np.random.uniform(-1.0, -0.5)
+        self.data.qpos[0] = np.random.uniform(-2, 2)
+        self.data.qpos[2] = 0.75
+        self.data.qpos[0] = np.random.uniform(-1.0, -0.5)
         self.data.qvel[0] = np.random.uniform(-0.2, 0.2)
 
-        #self.data.qpos[1] = np.random.uniform(-1.0, 1.0)
+        # self.data.qpos[1] = np.random.uniform(-1.0, 1.0)
         self.data.qvel[1] = np.random.uniform(-0.2, 0.2)
 
         self.state_history = np.zeros(self.state_size * self.state_history_length)
+
+
+        # Reset torso position
+        self.torso_state_history = []
+        self.lf_state_history = []
+        self.rf_state_history = []
+        self.state_max_length = 2
+        self.state_hist_frame_skip = 3
+        self.state_hist_frame_counter = 0
 
         #robot_starting_height = 0.4
         #self.data.qpos[2] = robot_starting_height
@@ -123,6 +132,16 @@ class SliderEnv(Env):
 
         return observation
 
+    def draw_pos_history(self, scene, history, width, color):
+        for i in range(1, len(history)):
+            current_pos = history[i].copy()
+            prev_pos = history[i-1]
+            
+            mj.mjv_initGeom(scene.geoms[scene.ngeom], mj.mjtGeom.mjGEOM_CAPSULE, np.zeros(3), np.zeros(3), np.zeros(9), color)
+            mj.mjv_makeConnector(scene.geoms[scene.ngeom], mj.mjtGeom.mjGEOM_CAPSULE, width,
+                                prev_pos[0], prev_pos[1], prev_pos[2],
+                                current_pos[0], current_pos[1], current_pos[2])
+            scene.ngeom+=1
 
     def render(self):
         # Set camera location
@@ -132,8 +151,7 @@ class SliderEnv(Env):
         self.cam.lookat = (torso_x, torso_y, 0.75)
         self.cam.azimuth = self.data.time * 10
 
-
-        self.cam.lookat = (2, 0, 0.7)
+        # self.cam.lookat = (2, 0, 0.7)
         self.cam.distance = 10
         self.cam.azimuth = 90
         self.cam.elevation = 0
@@ -150,6 +168,32 @@ class SliderEnv(Env):
         # Render out an image of the enviroment
         viewport = mj.MjrRect(0, 0, int(3000/1.0), int(1500/1.0))
         mj.mjv_updateScene(self.model, self.data, self.opt, None, self.cam, mj.mjtCatBit.mjCAT_ALL.value, self.scene)
+
+
+        # Draw traces
+        if(self.state_hist_frame_counter % self.state_hist_frame_skip == 0):
+            self.torso_state_history.append(torso_pos.copy())
+            self.lf_state_history.append(self.data.body("Left_Foot").xpos.copy())
+            self.rf_state_history.append(self.data.body("Right_Foot").xpos.copy())
+
+        self.state_hist_frame_counter += 1
+
+        print(len(self.torso_state_history))
+
+        if(len(self.torso_state_history) > self.state_max_length):
+            self.torso_state_history.pop(0)
+            self.lf_state_history.pop(0)
+            self.rf_state_history.pop(0)
+
+        width = 0.005
+        torso_color = np.array([1.0, 0.0, 0.0, 1.0])
+        lf_color = np.array([0.0, 1.0, 0.0, 1.0])
+        rf_color = np.array([0.0, 0.0, 1.0, 1.0])
+
+        self.draw_pos_history(self.scene, self.torso_state_history, width, torso_color)
+        self.draw_pos_history(self.scene, self.lf_state_history, width, lf_color)
+        self.draw_pos_history(self.scene, self.rf_state_history, width, rf_color)
+
         mj.mjr_render(viewport, self.scene, self.context)
 
         mj.glfw.glfw.swap_buffers(self.window)
@@ -160,6 +204,7 @@ class SliderEnv(Env):
     def step(self, action):
 
         # Apply a purturbation
+        self.data.xfrc_applied[2] = [0,0,0,  0,0,0]
         if(np.random.rand() < self.purtrub_prob):
             # print("BONK")
             F_x = np.random.normal() * self.purtrub_max[0]
@@ -194,10 +239,10 @@ class SliderEnv(Env):
         #     # print("vref change!")
         #     self.v_ref = (np.random.uniform(1.0, 0.0), np.random.uniform(-0.0, 0.0), np.random.uniform(-0.0, 0.0))
 
-        if(self.purtrub_count < self.purtrub_timesteps):
-            self.purtrub_count += 1
-        else:
-            self.data.xfrc_applied[2] = [0,0,0,  0,0,0]
+        # if(self.purtrub_count < self.purtrub_timesteps):
+        #     self.purtrub_count += 1
+        # else:
+        #     self.data.xfrc_applied[2] = [0,0,0,  0,0,0]
 
         info = {}
 
@@ -224,46 +269,46 @@ class SliderEnv(Env):
 
         # Force control
 
-        self.data.actuator("Left_Slide").ctrl = action[0] * 300
-        self.data.actuator("Right_Slide").ctrl = action[1] * 300
+        # self.data.actuator("Left_Slide").ctrl = action[0] * 300
+        # self.data.actuator("Right_Slide").ctrl = action[1] * 300
 
-        self.data.actuator("Left_Roll").ctrl = action[2] * 100
-        self.data.actuator("Right_Roll").ctrl = action[3] * 100
+        # self.data.actuator("Left_Roll").ctrl = action[2] * 100
+        # self.data.actuator("Right_Roll").ctrl = action[3] * 100
 
-        self.data.actuator("Left_Pitch").ctrl = action[4] * 65
-        self.data.actuator("Right_Pitch").ctrl = action[5] * 65
+        # self.data.actuator("Left_Pitch").ctrl = action[4] * 65
+        # self.data.actuator("Right_Pitch").ctrl = action[5] * 65
 
-        self.data.actuator("Left_Foot_Pitch").ctrl = action[6] * 15
-        self.data.actuator("Right_Foot_Pitch").ctrl = action[7] * 15
+        # self.data.actuator("Left_Foot_Pitch").ctrl = action[6] * 15
+        # self.data.actuator("Right_Foot_Pitch").ctrl = action[7] * 15
 
-        self.data.actuator("Left_Foot_Pitch").ctrl = action[8] * 15
-        self.data.actuator("Right_Foot_Pitch").ctrl = action[9] * 15
+        # self.data.actuator("Left_Foot_Pitch").ctrl = action[8] * 15
+        # self.data.actuator("Right_Foot_Pitch").ctrl = action[9] * 15
 
         # self.data.actuator("Left_Slide").ctrl = -100
 
-        # # ====== Left foot
-        # # Roll Pitch
-        # self.data.ctrl[0] = action[0] * 0.5 * scale
-        # self.data.ctrl[2] = action[1] * 0.8 * scale
+        # ====== Left foot
+        # Roll Pitch
+        self.data.ctrl[0] = action[0] * 0.5 * scale
+        self.data.ctrl[2] = action[1] * 0.8 * scale
         
-        # # Slide
-        # self.data.ctrl[4] = action[2] * 0.1 * scale
+        # Slide
+        self.data.ctrl[4] = action[2] * 0.1 * scale
 
-        # # Foot Roll Pitch
-        # self.data.ctrl[6] = action[3] * 0.5 * scale
-        # self.data.ctrl[8] = action[4] * 0.5 * scale
+        # Foot Roll Pitch
+        self.data.ctrl[6] = action[3] * 0.5 * scale
+        self.data.ctrl[8] = action[4] * 0.5 * scale
 
-        # # ====== Right foot
-        # # Roll Pitch
-        # self.data.ctrl[10] = action[5] * 0.4 * scale
-        # self.data.ctrl[12] = action[6] * 0.8 * scale
+        # ====== Right foot
+        # Roll Pitch
+        self.data.ctrl[10] = action[5] * 0.4 * scale
+        self.data.ctrl[12] = action[6] * 0.8 * scale
         
-        # # Slide
-        # self.data.ctrl[14] = action[7] * 0.1 * scale
+        # Slide
+        self.data.ctrl[14] = action[7] * 0.1 * scale
 
-        # # Foot Roll Pitch
-        # self.data.ctrl[16] = action[8] * 0.5 * scale
-        # self.data.ctrl[18] = action[9] * 0.5 * scale
+        # Foot Roll Pitch
+        self.data.ctrl[16] = action[8] * 0.5 * scale
+        self.data.ctrl[18] = action[9] * 0.5 * scale
 
     # Calculate current actuator power
     def actuator_power(self, actuator_name):
@@ -321,11 +366,11 @@ class SliderEnv(Env):
         # cost += self.cost_dict['foot_vel']
         
         # Adjust slide effort compared to other actuator effort
-        slide_factor = 1.0
+        slide_factor = 0.1
         roll_factor = 1.0
 
         # Lower ankle effort compared to other actuator effort
-        ankle_factor = 10.0
+        ankle_factor = 1.0
 
         actuator_effort = self.actuator_power("Left_Slide") ** 2 * slide_factor
         actuator_effort += self.actuator_power("Right_Slide") ** 2 * slide_factor
@@ -382,7 +427,7 @@ class SliderEnv(Env):
         forward_rel = np.zeros(3)
         mj.mju_rotVecQuat(forward_rel, forward, quat)
 
-        self.cost_dict["body_orientation"] = 0.5 * np.linalg.norm([up_rel[0], up_rel[1]]) * 5.0
+        self.cost_dict["body_orientation"] = 2.5 * np.linalg.norm([up_rel[0], up_rel[1]])
         self.cost_dict["body_orientation"] += 0.2 * np.linalg.norm([forward_rel[1], forward_rel[2]])
         cost += self.cost_dict["body_orientation"]
         
@@ -418,7 +463,23 @@ class SliderEnv(Env):
         # === CLOCK ===
         clock = []
 
-        clock.append(10 * np.cos(1 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(0.5 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(0.6 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(0.7 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(0.8 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(0.9 * self.cycle_clock * 2 * np.pi / self.step_time))
+        clock.append(10 * np.cos(1.0 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.1 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.2 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.3 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.4 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.5 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.6 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.7 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.8 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(1.9 * self.cycle_clock * 2 * np.pi / self.step_time))
+        # clock.append(10 * np.cos(2.0 * self.cycle_clock * 2 * np.pi / self.step_time))
+
         # clock.append(10 * np.sin(1 * self.cycle_clock * 2 * np.pi / self.step_time))
 
         #clock.append(10 * np.cos(1 * self.cycle_clock * 4 * np.pi / self.step_time))
