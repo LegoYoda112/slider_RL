@@ -8,14 +8,20 @@ from stable_baselines3 import PPO
 
 
 
-trial_name = "model_v15-forward3-5-20-obts"
-trial_name = "model_v15-forward5-42"
+trial_name = "model_v15-forward3-5-3-stairs"
+# trial_name = "model_v17-forward3-obst"
+# trial_name = "model_v17-forward8-omni"
+# trial_name = "model_v17-forward3-obst"
+
+trial_name = "model_v17-forward2"
+
+trial_name = "model_v15-forward3-5-1"
 
 model_save_path = "./trained_models/" + trial_name
 
 env = SliderEnv(trial_name)
 
-model =  PPO.load(model_save_path + "/model-3", env=env)
+model =  PPO.load(model_save_path + "/model-938", env=env)
 
 forward = False
 
@@ -37,7 +43,7 @@ while True:
     for i in range(10000):
         i+=1
 
-        action, _state = model.predict(obs, deterministic=True)
+        action, _state = model.predict(obs, deterministic=False)
 
         #print(action)
         #print()

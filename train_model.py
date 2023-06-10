@@ -11,24 +11,24 @@ from stable_baselines3.common.callbacks import BaseCallback
 timesteps = 500_000
 total_timesteps = 0
 
-trial_name = "model_v15-forward5-42"
+trial_name = "model_v17-forward9"
 model_save_path = "./trained_models/" + trial_name
 
 
 env = SliderEnv(trial_name)
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0002, 
       tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
 
 # n_steps = int(8192 * 0.5)
 
-load = False
+load = True
 
 if(load): 
-    trial_load_name = "model_v15-forward3-5-9-obts"
+    trial_load_name = "model_v17-forward7"
     model_save_path_load = "./trained_models/" + trial_load_name
 
-    model =  PPO.load(model_save_path_load + "/model-100", env=env, learning_rate = 0.000001)
+    model =  PPO.load(model_save_path_load + "/model-39", env=env, learning_rate = 0.00005)
 
 # Make save path
 try:
@@ -55,7 +55,7 @@ class TensorboardCallback(BaseCallback):
         return True
 
 #Seed the enviroment
-env.seed(420)
+env.seed(422)
 
 # env.purtrub_max = [500, 500, 500]
 
