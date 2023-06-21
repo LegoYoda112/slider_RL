@@ -1,8 +1,11 @@
 #!/usr/bin/env python3 
 
-import rclpy
-from rclpy.node import Node
 
+print("importing rclpy")
+import rclpy
+
+print("importing ros packages")
+from rclpy.node import Node
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Vector3Stamped
@@ -13,9 +16,13 @@ from std_msgs.msg import Float32MultiArray
 
 import time
 
+print("importing PPO")
 from stable_baselines3 import PPO
 
+print("importing numpy")
 import numpy as np
+
+print("done importing")
 
 class SliderRLController(Node):
 
@@ -24,13 +31,15 @@ class SliderRLController(Node):
 
         self.get_logger().info("Starting RL controller")
 
-
+        # ======= STATE HISTORY =====
         self.qpos = np.zeros(17) # body quaternion, body position, joint position
         self.qvel = np.zeros(16) # body angular vel, body vel, joint position
         self.sin_clock = np.zeros(1)
         self.vref = np.zeros(2)
 
-        self.state_history = np.zeros(3 * (len(self.qpos) + len(self.qvel)))
+        self.state_size = 31
+
+        self.state_history = np.zeros(3 * self.state_size)
 
         observation_length = (len(self.sin_clock) +
                               len(self.vref) + 
@@ -41,7 +50,8 @@ class SliderRLController(Node):
         trial_name = ""
         model_save_path = "/home/thoma/Documents/ros2_ws/src/slider_RL/trained_models" + trial_name
 
-        self.model = PPO.load(model_save_path + "/model-13-cg-change")
+        self.model = PPO.load(model_save_path + "/model-40")
+        # self.model = PPO.load(model_save_path + "/model-39-slow")
 
         self.position_goal_publisher = self.create_publisher(
             Float32MultiArray, '/slider/control/joint/position_goals', 10)
@@ -124,7 +134,7 @@ class SliderRLController(Node):
         self.action_scale = 0.0
 
         self.clock_value = 0
-        self.dt = 0.02 # wrong don't do this thomas please
+        self.dt = 0.01 # wrong don't do this thomas please
 
         self.abort = False
 
@@ -141,8 +151,9 @@ class SliderRLController(Node):
 
     def run_policy(self):
 
-        self.step_time = 0.7
+        self.step_time = 0.9
         self.clock_value += self.dt  # highly incorrect oh my god
+        self.cycle_clock = self.clock_value
 
 
         # Make full state
@@ -154,15 +165,19 @@ class SliderRLController(Node):
         self.state_history[2*self.state_size:3*self.state_size] = self.state
 
         # Make clock signal
-        self.sin_clock = np.array(10 * np.cos(1 * self.cycle_clock * 2 * np.pi / self.step_time))
+        self.sin_clock = np.array([10 * np.cos(1 * self.cycle_clock * 2 * np.pi / self.step_time)])
 
         # Set up target velocity
         self.vref = np.array([0.0, 0.0])
+
+        #print(self.state)
+        #print()
 
         # Build observation vector and append
         self.observation = np.array(np.concatenate((self.state_history, self.sin_clock, self.vref)), dtype = np.float16)
         action = self.model.predict(self.observation, deterministic=True)[0]
 
+        # print(self.observation)
         goal_msg = Float32MultiArray()
         goal_msg.data = np.zeros(10).tolist()
 
@@ -171,22 +186,24 @@ class SliderRLController(Node):
         #     print(round(value, 2), i)
         #     i += 1
 
-        # print()
-        # print(action)
+        #print()
+        #print(action)
+        #print()
 
         goal_msg.data[0] = action[0] * 0.3 * self.action_scale
         goal_msg.data[1] = action[1] * 0.8 * self.action_scale
-        goal_msg.data[2] = action[2] * 0.1 * self.action_scale
+        goal_msg.data[2] = action[2] * 0.1 * self.action_scale * 1.0
         goal_msg.data[3] = action[3] * 0.5 * self.action_scale
-        goal_msg.data[4] = action[4] * 0.5 * self.action_scale
+        goal_msg.data[4] = action[4] * 0.5 * self.action_scale - 0.00
 
         goal_msg.data[5] = action[5] * 0.3 * self.action_scale
         goal_msg.data[6] = action[6] * 0.8 * self.action_scale
-        goal_msg.data[7] = action[7] * 0.1 * self.action_scale
-        goal_msg.data[8] = action[8] * 0.5 * self.action_scale # Left Foot Pitch
-        goal_msg.data[9] = - action[9] * 0.5 * self.action_scale
+        goal_msg.data[7] = action[7] * 0.1 * self.action_scale * 1.0 
+        goal_msg.data[8] = action[8] * 0.5 * self.action_scale + 0.0 # Left Foot Pitch
+        goal_msg.data[9] = action[9] * 0.5 * self.action_scale + 0.00
 
         print(goal_msg.data)
+        print()
 
         if(self.abort == False):
             self.position_goal_publisher.publish(goal_msg)
@@ -224,10 +241,10 @@ class SliderRLController(Node):
         self.qvel[5] = msg.angular_velocity.z
 
         # Set body orientation
-        self.qpos[0] = msg.orientation.w 
-        self.qpos[1] = msg.orientation.x
-        self.qpos[2] = msg.orientation.y 
-        self.qpos[3] = msg.orientation.z
+        self.qpos[3] = msg.orientation.w 
+        self.qpos[4] = msg.orientation.x
+        self.qpos[5] = msg.orientation.y 
+        self.qpos[6] = msg.orientation.z
 
     def body_velocity_callback(self, msg):
         
@@ -248,7 +265,7 @@ class SliderRLController(Node):
     def joy_callback(self, msg):
         self.action_scale = 1 - (msg.axes[5] + 1) / 2.0
 
-        print(self.action_scale)
+        # print(self.action_scale)
 
         if(msg.buttons[1]):
             self.abort = True
