@@ -521,6 +521,7 @@ class SliderEnv(Env):
 
         return observation
 
+
     # Handle keyboard callbacks (for teleop)
     def key_callback(self, window, key, scancode, action, mods):
         up = 265

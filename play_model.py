@@ -7,7 +7,6 @@ import numpy as np
 from stable_baselines3 import PPO
 
 
-
 trial_name = "model_v15-forward3-5-3-stairs"
 # trial_name = "model_v17-forward3-obst"
 # trial_name = "model_v17-forward8-omni"
