@@ -6,21 +6,29 @@ import glob
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback
 
-env = SliderEnv()
 
-model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0003, 
-      tensorboard_log="./trained_models/tensorboard", n_steps = int(8192))
-# n_steps = int(8192 * 0.5),
-timesteps = 100_000
+
+timesteps = 500_000
 total_timesteps = 0
 
-trial_name = "forward-9"
+trial_name = "model_v17-forward9"
 model_save_path = "./trained_models/" + trial_name
 
-# trial_load_name = "forward-2"
-# model_save_path_load = "./trained_models/" + trial_load_name
 
-# model =  PPO.load(model_save_path_load + "/model-23", env=env)
+env = SliderEnv(trial_name)
+
+model = PPO("MlpPolicy", env, verbose=1, learning_rate = 0.0002, 
+      tensorboard_log="./trained_models/tensorboard", n_steps = int(8192 * 0.5))
+
+# n_steps = int(8192 * 0.5)
+
+load = True
+
+if(load): 
+    trial_load_name = "model_v17-forward7"
+    model_save_path_load = "./trained_models/" + trial_load_name
+
+    model =  PPO.load(model_save_path_load + "/model-39", env=env, learning_rate = 0.00005)
 
 # Make save path
 try:
@@ -46,7 +54,14 @@ class TensorboardCallback(BaseCallback):
         # self.logger.record("reward", value)
         return True
 
+#Seed the enviroment
+env.seed(422)
+
+# env.purtrub_max = [500, 500, 500]
+
 while True:
+
+
     total_timesteps += timesteps
     model.learn(total_timesteps=timesteps, tb_log_name = trial_name, reset_num_timesteps = False, callback=TensorboardCallback())
     model.save("trained_models/" + trial_name + "/" "model-" + str(int(total_timesteps / timesteps)))

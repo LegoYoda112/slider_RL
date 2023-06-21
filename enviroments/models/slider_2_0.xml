@@ -4,7 +4,7 @@
   
   <!-- Default values -->
   <default>
-    <joint limited = "true" damping = "1.0" armature = "0"/>
+    <joint limited = "true" damping = "0.0" armature = "0"/>
     <position forcelimited = "true" forcerange = "-30 30" />
     <velocity forcelimited = "true" forcerange = "-30 30" />
 
@@ -14,7 +14,7 @@
 
     <default class = "hip_roll_vel">
       <!-- -144 144 -->
-      <velocity  kv="5.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
+      <velocity  kv="3.0" forcelimited = "true" forcerange = "-144 144" group="1" gear = "1"/>
     </default>
 
     <default class = "hip_pitch_pos">
@@ -23,24 +23,24 @@
 
     <default class = "hip_pitch_vel">
       <!-- -65 65 -->
-      <velocity  kv="5.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+      <velocity  kv="3.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
     </default>
 
 
     <default class = "slide_joint">
-      <position ctrllimited="true" kp="500.0" gear="1" forcerange = "-200 200"/>
+      <position ctrllimited="true" kp="1500.0" gear="1" forcerange = "-200 200"/>
     </default>
 
     <default class = "slide_vel">
-      <velocity kv="50.0" group="1" gear = "1" forcerange = "-200 200"/>
+      <velocity kv="100.0" group="1" gear = "1" forcerange = "-200 200"/>
     </default>
 
     <default class = "foot_joint">
-        <position forcelimited="true" ctrllimited="true" kp="30.0" gear = "1" forcerange="-20 20"/>
+        <position forcelimited="true" ctrllimited="true" kp="20.0" gear = "1" forcerange="-15 15"/>
     </default>
 
     <default class = "foot_vel">
-        <velocity forcelimited="true" kv="2.0" group="1" gear ="1" forcerange = "-20 20"/>
+        <velocity forcelimited="true" kv="0.5" group="1" gear ="1" forcerange = "-15 15"/>
     </default>
   </default>
 
@@ -69,6 +69,10 @@
     <!-- 0.85 -->
       <freejoint/>
 
+      <!-- <body>
+        <geom type="box" size="0.05 0.05 0.3" pos = "0.0 0.0 0.3" mass = "1"/>
+      </body> -->
+
       <site name = "Torso"/>
       <site name = "Torso-rangefinder1" zaxis = "0 0 -1"/>
       <site name = "Torso-rangefinder2" zaxis = "0.2 0 -1"/>
@@ -76,30 +80,36 @@
       <site name = "Torso-rangefinder4" zaxis = "0.6 0 -1"/>
       <site name = "Torso-rangefinder5" zaxis = "0.8 0 -1"/>
 
-      <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="2.43528" diaginertia="0.00413343 0.00271163 0.00231369"/>
+      <inertial pos="-0.0453876 4.1102e-09 0.0190139" quat="0.707106 0.707106 0.000977246 -0.0010287" mass="1.0" diaginertia="0.00413343 0.00271163 0.00231369"/>
       <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
       <body name="Right_Pitch_Casing" pos="0 -0.075 0">
-        <inertial pos="-0.00651307 -0.000261818 7.57108e-06" quat="0.499137 0.498716 0.501955 0.500186" mass="1.12926" diaginertia="0.00204306 0.00154557 0.00127401"/>
+        <inertial pos="-0.00651307 -0.000261818 7.57108e-06" quat="0.499137 0.498716 0.501955 0.500186" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
         <joint name="Right_Roll" pos="0 0 0" axis="-1 0 0" range="-1.57 0.35"/>
         <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Pitch_Casing"/>
         <body name="Right_Slide_Casing" pos="0 -0.1042 0">
-          <inertial pos="-0.0324497 -0.0178444 0.000925652" quat="0.877891 -0.0251846 0.00443872 0.478178" mass="1.06491" diaginertia="0.00191679 0.00171145 0.000840947"/>
+          <inertial pos="-0.0324497 -0.0178444 0.000925652" quat="0.877891 -0.0251846 0.00443872 0.478178" mass="1.2" diaginertia="0.00191679 0.00171145 0.000840947"/>
           <joint name="Right_Pitch" pos="0 0 0" axis="0 1 0" range="-1.57 1.57"/>
           <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Slide_Casing"/>
           <body name="Right_Leg" pos="0 0 -0.7">
-            <inertial pos="-0.0233998 0.000112329 0.455008" quat="0.707484 4.63574e-05 6.61193e-06 0.706729" mass="1.78099" diaginertia="0.0432293 0.0423994 0.00149023"/>
+            <inertial pos="-0.0233998 0.000112329 0.455008" quat="0.707484 4.63574e-05 6.61193e-06 0.706729" mass="1.9" diaginertia="0.0432293 0.0423994 0.00149023"/>
             <joint name="Right_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26"/>
             <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Leg"/>
             <body name="Right_Foot_Pitch_Link" pos="0 0 0">
-              <inertial pos="6.30628e-05 2.21613e-08 -1.27034e-08" quat="0.707095 2.01965e-06 2.01972e-06 0.707118" mass="0.0383125" diaginertia="4.37124e-06 4.32351e-06 4.11906e-06"/>
+              <inertial pos="6.30628e-05 2.21613e-08 -1.27034e-08" quat="0.707095 2.01965e-06 2.01972e-06 0.707118" mass="0.04" diaginertia="4.37124e-06 4.32351e-06 4.11906e-06"/>
               <joint name="Right_Foot_Pitch" pos="0 0 0" axis="0 1 0" range="-0.52 0.52"/>
               <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot_Pitch_Link"/>
               <body name="Right_Foot" pos="0 0 0">
-                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.760542" diaginertia="0.00718389 0.00635924 0.00483524"/>
+                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/>
                 <geom name = "Right_Foot_Contact" type = "box" size = "0.11 0.07 0.006" mass = "0" pos = "0 0 -0.027" rgba = "0.5 0.5 0.5 0.0"/>
                  <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
+
+
+                <geom size="0.001" pos="0.1 0.04 -0.044"/>
+                <geom size="0.001" pos="0.1 -0.04 -0.044"/>
+                <geom size="0.001" pos="-0.1 -0.04 -0.044"/>
+                <geom size="0.001" pos="-0.1 0.04 -0.044"/>
 
               </body> 
             </body>
@@ -107,23 +117,23 @@
         </body>
       </body>
       <body name="Left_Pitch_Casing" pos="0 0.075 0">
-        <inertial pos="-0.00651307 0.000261818 -7.57108e-06" quat="0.501955 0.500186 0.499137 0.498716" mass="1.12926" diaginertia="0.00204306 0.00154557 0.00127401"/>
+        <inertial pos="-0.00651307 0.000261818 -7.57108e-06" quat="0.501955 0.500186 0.499137 0.498716" mass="2.5" diaginertia="0.00204306 0.00154557 0.00127401"/>
         <joint name="Left_Roll" pos="0 0 0" axis="-1 0 0" range="-0.35 1.57"/>
         <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Pitch_Casing"/>
         <body name="Left_Slide_Casing" pos="0 0.1042 0">
-          <inertial pos="-0.0324497 0.0178444 -0.000925651" quat="0.478178 -0.00443873 0.0251846 0.87789" mass="1.06491" diaginertia="0.00191679 0.00171145 0.000840947"/>
+          <inertial pos="-0.0324497 0.0178444 -0.000925651" quat="0.478178 -0.00443873 0.0251846 0.87789" mass="1.2" diaginertia="0.00191679 0.00171145 0.000840947"/>
           <joint name="Left_Pitch" pos="0 0 0" axis="0 -1 0" range="-1.57 1.57"/>
           <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Slide_Casing"/>
           <body name="Left_Leg" pos="0 0 -0.7">
-            <inertial pos="-0.0233998 0.000112329 0.455008" quat="0.707484 4.63574e-05 6.61193e-06 0.706729" mass="1.78099" diaginertia="0.0432293 0.0423994 0.00149023"/>
+            <inertial pos="-0.0233998 0.000112329 0.455008" quat="0.707484 4.63574e-05 6.61193e-06 0.706729" mass="1.9" diaginertia="0.0432293 0.0423994 0.00149023"/>
             <joint name="Left_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26"/>
             <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Leg"/>
             <body name="Left_Foot_Pitch_Link" pos="0 0 0">
-              <inertial pos="6.30628e-05 2.21613e-08 -1.27034e-08" quat="0.707095 2.01965e-06 2.01972e-06 0.707118" mass="0.0383125" diaginertia="4.37124e-06 4.32351e-06 4.11906e-06"/>
+              <inertial pos="6.30628e-05 2.21613e-08 -1.27034e-08" quat="0.707095 2.01965e-06 2.01972e-06 0.707118" mass="0.04" diaginertia="4.37124e-06 4.32351e-06 4.11906e-06"/>
               <joint name="Left_Foot_Pitch" pos="0 0 0" axis="0 -1 0" range="-0.52 0.52"/>
               <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot_Pitch_Link"/>
               <body name="Left_Foot" pos="0 0 0">
-                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.760542" diaginertia="0.00718389 0.00635924 0.00483524"/>
+                <inertial pos="-0.00123043 0 -0.0249007" quat="0 0.707113 0 0.7071" mass="0.9" diaginertia="0.00718389 0.00635924 0.00483524"/>
                 <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
                 <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot" conaffinity = "0" contype = "0"/>
                 <geom name = "Left_Foot_Contact" type = "box" size = "0.11 0.07 0.006" mass = "0" pos = "0 0 -0.027" rgba = "0.5 0.5 0.5 0.0"/>

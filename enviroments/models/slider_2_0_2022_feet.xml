@@ -1,0 +1,255 @@
+<mujoco model="slider_joint_control">
+  <compiler angle="radian" meshdir="../meshes/" autolimits="true"  balanceinertia="true"/>
+  <!-- <size njmax="500" nconmax="100"/> -->
+  
+  <!-- Default values -->
+  <default>
+    <joint limited = "true" damping = "0.0" armature = "0"/>
+    <position forcelimited = "true" forcerange = "-30 30" />
+    <velocity forcelimited = "true" forcerange = "-30 30" />
+
+    <default class = "hip_roll_pos">
+      <position kp="200.0" ctrllimited="true" forcelimited = "true" forcerange = "-140 140" ctrlrange="-0.3 0.3"/>
+    </default>
+
+    <default class = "hip_roll_vel">
+      <!-- -144 144 -->
+      <velocity  kv="10.0" forcelimited = "true" forcerange = "-140 140" group="1" gear = "1"/>
+    </default>
+
+    <default class = "hip_pitch_pos">
+      <position kp="200.0" ctrllimited="true" forcelimited = "true" forcerange = "-65 65" ctrlrange="-0.8 0.8"/>
+    </default>
+
+    <default class = "hip_pitch_vel">
+      <!-- -65 65 -->
+      <velocity  kv="10.0" forcelimited = "true" forcerange = "-65 65" group="1" gear = "1"/>
+    </default>
+
+ 
+    <default class = "slide_joint">
+      <position kp="3000.0" ctrllimited="true" forcelimited = "true" gear="1" forcerange = "-600 600"/>
+    </default>
+
+    <default class = "slide_vel">
+      <velocity kv="100.0"  forcelimited = "true" group="1" gear = "1" forcerange = "-600 600"/>
+    </default>
+
+    <default class = "foot_joint">
+        <position forcelimited="true" ctrllimited="true" kp="50.0" gear = "1" forcerange="-15 15"/>
+    </default>
+
+    <default class = "foot_vel">
+        <velocity forcelimited="true" kv="3.0" group="1" gear ="1" forcerange = "-15 15"/>
+    </default>
+  </default>
+
+  <!-- Assets -->
+  <asset>
+    <mesh name="base_link" file="base_link.STL"/> 
+    <mesh name="Right_Pitch_Casing" file="Right_Pitch_Casing.STL"/>
+    <mesh name="Right_Slide_Casing" file="Right_Slide_Casing.STL"/>
+    <mesh name="Right_Leg" file="Right_Leg.STL"/>
+    <mesh name="Right_Foot_Pitch_Link" file="Right_Foot_Pitch_Link.STL"/>
+    <mesh name="Right_Foot" file="2022_Foot.STL"/>
+    <mesh name="Left_Pitch_Casing" file="Left_Pitch_Casing.STL"/>
+    <mesh name="Left_Slide_Casing" file="Left_Slide_Casing.STL"/>
+    <mesh name="Left_Leg" file="Left_Leg.STL"/>
+    <mesh name="Left_Foot_Pitch_Link" file="Left_Foot_Pitch_Link.STL"/>
+    <mesh name="Left_Foot" file="Left_Foot.STL"/>
+  </asset>
+
+  <!-- Robot description -->
+  <worldbody>
+    <body name = "sensor_base">
+
+    </body>
+
+    <body name="base_link" pos="0 0.0 0.85">
+    <!-- 0.85 -->
+      <freejoint/>
+
+      <!-- <body>
+        <geom type="box" size="0.05 0.05 0.3" pos = "0.0 0.0 0.3" mass = "1"/>
+      </body> -->
+
+      <site name = "Torso"/>
+      <site name = "Torso-rangefinder1" zaxis = "0 0 -1"/>
+      <site name = "Torso-rangefinder2" zaxis = "0.2 0 -1"/>
+      <site name = "Torso-rangefinder3" zaxis = "0.4 0 -1"/>
+      <site name = "Torso-rangefinder4" zaxis = "0.6 0 -1"/>
+      <site name = "Torso-rangefinder5" zaxis = "0.8 0 -1"/>
+
+      <inertial pos="-0.075 0.0 -0.073" mass="3.791" fullinertia="0.036 0.026 0.051 -8.215e-7 -0.004 9.804e-6"/>
+      <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link" conaffinity = "0" contype = "0"/>
+      <!-- <geom type = "box" size = "0.1 0.1 0.4" pos = "0.04 0 0.45" mass="4"/> -->
+      <body name="Right_Pitch_Casing" pos="0 -0.075 0">
+        <inertial pos="0.003 0.003 0.0" mass="2.317" fullinertia="0.003 0.005 0.005 -9.851e-7 1.129e-7 -4.134e-6"/>
+        <joint name="Right_Roll" pos="0 0 0" axis="-1 0 0" range="-1.57 0.35"/>
+        <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Pitch_Casing" conaffinity = "0" contype = "0"/>
+        <body name="Right_Slide_Casing" pos="0 -0.1042 0">
+          <inertial pos="-0.034 -0.027 0.001" mass="1.6" fullinertia="0.003 0.003 0.003 -4.546e-4 3.909e-5 -3.650e-5"/>
+          <joint name="Right_Pitch" pos="0 0 0" axis="0 1 0" range="-1.57 1.57"/>
+          <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Slide_Casing" conaffinity = "0" contype = "0"/>
+          <body name="Right_Leg" pos="0 0 -0.7">
+            <inertial pos="-0.037 0.0 -0.237" mass="1.84" fullinertia="0.204 0.205 0.003 -7.479e-7 -0.01 6.440e-6"/>
+
+            <joint name="Right_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26" />
+            <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Leg" conaffinity = "0" contype = "0"/>
+            <body name="Right_Foot_Pitch_Link" pos="0 0 0">
+              <inertial pos="0.0 0.0 0.0" mass="0.039" fullinertia="4.354e-6 4.402e-6 4.148e-6 0.0 0.0 0.0"/>
+              <joint name="Right_Foot_Pitch" pos="0 0 0" axis="0 1 0" range="-0.52 0.52"/>
+              <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot_Pitch_Link" conaffinity = "0" contype = "0"/>
+              <body name="Right_Foot" pos="0 0 0">
+                <inertial pos="-0.015 0.0 -0.029" mass="0.2" fullinertia="0.002 0.004 0.006 -1.108e-7 2.353e-4 3.204e-8"/>
+                <joint name="Right_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
+                <geom name = "Right_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/>
+                <geom name = "Right_Foot_Contact" type = "box" size = "0.115 0.085 0.018" pos = "0 0 -0.031" rgba = "0.5 0.5 0.5 0.0" condim="3" friction="1 1"/>
+                 <site name = "Right-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
+
+                <!-- <geom size="0.01" pos="0.08181 0.04715 -0.0325"/>
+                <geom size="0.01" pos="0.08181 -0.04715 -0.0325" rgba="0 0 0.8 1"/>
+                <geom size="0.01" pos="-0.08181 -0.04715 -0.0325"/>
+                <geom size="0.01" pos="-0.08181 0.04715 -0.0325"/> -->
+              </body> 
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="Left_Pitch_Casing" pos="0 0.075 0">
+        <inertial pos="0.003 -0.003 0.0" mass="2.317" fullinertia="0.003 0.005 0.005 -9.851e-7 1.129e-7 -4.134e-6"/>
+        <joint name="Left_Roll" pos="0 0 0" axis="-1 0 0" range="-0.35 1.57"/>
+
+        <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Pitch_Casing" conaffinity = "0" contype = "0"/>
+        <body name="Left_Slide_Casing" pos="0 0.1042 0">
+          <inertial pos="-0.034 -0.027 0.001" mass="1.6" fullinertia="0.003 0.003 0.003 -4.546e-4 3.909e-5 -3.650e-5"/>
+          <joint name="Left_Pitch" pos="0 0 0" axis="0 -1 0" range="-1.57 1.57"/>
+          <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Slide_Casing" conaffinity = "0" contype = "0"/>
+          <body name="Left_Leg" pos="0 0 -0.7">
+            <inertial pos="-0.037 0.0 -0.237" mass="1.84" fullinertia="0.204 0.205 0.003 -7.479e-7 -0.01 6.440e-6"/>
+
+            <joint name="Left_Slide" pos="0 0 0" axis="0 0 1" type="slide" range="-0.35 0.26"  />
+            <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Leg" conaffinity = "0" contype = "0"/>
+            <body name="Left_Foot_Pitch_Link" pos="0 0 0">
+              <inertial pos="0.0 0.0 0.0" mass="0.039" fullinertia="4.354e-6 4.402e-6 4.148e-6 0.0 0.0 0.0"/>
+              <joint name="Left_Foot_Pitch" pos="0 0 0" axis="0 -1 0" range="-0.52 0.52"/>
+              <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Left_Foot_Pitch_Link" conaffinity = "0" contype = "0"/>
+              <body name="Left_Foot" pos="0 0 0">
+                <inertial pos="-0.015 0.0 -0.029" mass="0.2" fullinertia="0.002 0.004 0.006 -1.108e-7 2.353e-4 3.204e-8"/>
+                <joint name="Left_Foot_Roll" pos="0 0 0" axis="1 0 0" range="-0.52 0.52"/>
+                <geom name = "Left_Foot" type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="Right_Foot" conaffinity = "0" contype = "0"/>
+                <geom name = "Left_Foot_Contact" type = "box" size = "0.115 0.085 0.018" mass = "0" pos = "0 0 -0.031" rgba = "0.5 0.5 0.5 0.0" condim="3" friction="1 1"/>
+                <site name = "Left-Foot" size = "0.2 0.1 0.05" type = "box" rgba = "0.5 0.5 0.5 0.0"/>
+
+                <!-- <geom size="0.01" pos="0.08181 0.04715 -0.0325"/>
+                <geom size="0.01" pos="0.08181 -0.04715 -0.0325" rgba="0 0 0.8 1"/>
+                <geom size="0.01" pos="-0.08181 -0.04715 -0.0325"/>
+                <geom size="0.01" pos="-0.08181 0.04715 -0.0325"/> -->
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <contact>
+    <exclude body1= "base_link" body2 = "Right_Pitch_Casing"/>
+    <exclude body1= "base_link" body2 = "Right_Slide_Casing"/>
+    <exclude body1= "base_link" body2 = "Right_Leg"/>
+    <exclude body1= "Right_Pitch_Casing" body2 = "Right_Leg"/>
+    <exclude body1= "Right_Foot" body2 = "Right_Leg"/>
+
+    <exclude body1= "base_link" body2 = "Left_Pitch_Casing"/>
+    <exclude body1= "base_link" body2 = "Left_Slide_Casing"/>
+    <exclude body1= "base_link" body2 = "Left_Leg"/>
+    <exclude body1= "Left_Pitch_Casing" body2 = "Left_Leg"/>
+    <exclude body1= "Left_Foot" body2 = "Left_Leg"/>
+
+    <exclude body1= "Left_Foot" body2 = "Left_Foot_Pitch_Link"/>
+    <exclude body1= "Left_Leg" body2 = "Left_Foot_Pitch_Link"/>
+
+    <exclude body1= "Right_Foot" body2 = "Right_Foot_Pitch_Link"/>
+    <exclude body1= "Right_Leg" body2 = "Right_Foot_Pitch_Link"/>
+  </contact>
+
+  <!-- Actuator Description -->
+  <actuator>
+
+        <!-- Left leg control -->
+
+        <!-- Right leg control -->
+
+        <!-- <motor name="Right_Roll" joint="Right_Roll" forcerange="-144 144"/>
+
+        <motor name="Right_Pitch" joint="Right_Pitch" forcerange="-65 65"/>
+
+        <motor name="Right_Slide" joint="Right_Slide" forcerange="-600 600"/>
+
+        <motor name="Right_Foot_Roll" joint="Right_Foot_Roll" forcerange="-15 15"/>
+
+        <motor name="Right_Foot_Pitch" joint="Right_Foot_Pitch" forcerange="-15 15"/>
+
+        <motor name="Left_Roll" joint="Left_Roll" forcerange="-144 144"/>
+
+        <motor name="Left_Pitch" joint="Left_Pitch" forcerange="-65 65"/>
+
+        <motor name="Left_Slide" joint="Left_Slide" forcerange="-600 600"/>
+
+        <motor name="Left_Foot_Roll" joint="Left_Foot_Roll" forcerange="-15 15"/>
+
+        <motor name="Left_Foot_Pitch" joint="Left_Foot_Pitch" forcerange="-15 15"/> -->
+        
+
+        <position name="Right_Roll" joint="Right_Roll" class="hip_roll_pos"/>
+        <velocity joint="Right_Roll" class="hip_roll_vel"/>
+
+        <position name="Right_Pitch" joint="Right_Pitch" class="hip_pitch_pos"/>
+        <velocity joint="Right_Pitch" class="hip_pitch_vel"/>
+
+        <position name="Right_Slide" joint="Right_Slide" ctrlrange="-0.1 0.3" class="slide_joint"/>
+        <velocity joint="Right_Slide" class="slide_vel"/>
+
+        <position name="Right_Foot_Roll" joint="Right_Foot_Roll" ctrlrange="-0.5 0.5" class="foot_joint"/>
+        <velocity joint="Right_Foot_Roll" class = "foot_vel"/>
+
+        <position name="Right_Foot_Pitch" joint="Right_Foot_Pitch" ctrlrange="-0.5 0.5" class="foot_joint"/>
+        <velocity joint="Right_Foot_Pitch" class = "foot_vel"/>
+
+        <position name="Left_Roll" joint="Left_Roll" class="hip_roll_pos"/>
+        <velocity joint="Left_Roll" class="hip_roll_vel"/>
+
+        <position name="Left_Pitch" joint="Left_Pitch" class="hip_pitch_pos"/>
+        <velocity joint="Left_Pitch" class="hip_pitch_vel"/>
+
+        <position name="Left_Slide" joint="Left_Slide" ctrlrange="-0.1 0.3" class="slide_joint"/>
+        <velocity joint="Left_Slide" class="slide_vel"/>
+
+        <position name="Left_Foot_Roll" joint="Left_Foot_Roll" ctrlrange="-0.5 0.5" class="foot_joint"/>
+        <velocity joint="Left_Foot_Roll" class = "foot_vel"/>
+
+        <position name="Left_Foot_Pitch" joint="Left_Foot_Pitch" ctrlrange="-0.5 0.5" class="foot_joint"/>
+        <velocity joint="Left_Foot_Pitch" class = "foot_vel"/>
+    </actuator>
+
+    <!-- Sensors -->
+    <sensor>
+        <velocimeter name = "right-foot-vel" site = "Right-Foot"/>
+        <velocimeter name = "left-foot-vel" site = "Left-Foot"/>
+
+        <velocimeter name = "body-vel" site = "Torso"/>
+        <gyro name = "body-gyro" site = "Torso"/>
+        <accelerometer name = "body-accel" site = "Torso"/>
+
+        <touch name = "left-foot-touch" site = "Left-Foot"/>
+        <touch name = "right-foot-touch" site = "Right-Foot"/>
+
+        <!-- <rangefinder name = "dist1" site="Torso-rangefinder1" cutoff = "5"/>
+        <rangefinder name = "dist2" site="Torso-rangefinder2" cutoff = "5"/>
+        <rangefinder name = "dist3" site="Torso-rangefinder3" cutoff = "5"/>
+        <rangefinder name = "dist4" site="Torso-rangefinder4" cutoff = "5"/>
+        <rangefinder name = "dist5" site="Torso-rangefinder5" cutoff = "5 "/> -->
+    </sensor>
+
+    
+</mujoco>
