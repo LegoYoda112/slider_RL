@@ -47,8 +47,7 @@ class SliderRLController(Node):
         
         self.observation = np.zeros(observation_length)
 
-        trial_name = ""
-        model_save_path = "/home/thoma/Documents/ros2_ws/src/slider_RL/trained_models" + trial_name
+        model_save_path = "/home/thoma/Documents/ros2_ws/src/slider_RL/rl_models"
 
         self.model = PPO.load(model_save_path + "/model-40")
         # self.model = PPO.load(model_save_path + "/model-39-slow")
